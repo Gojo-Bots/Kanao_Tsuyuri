@@ -1,0 +1,39 @@
+{
+    "name": "ChimkuEnglishBot",
+    "description": "A telegram bot to find the files on the channel or group",
+    "repository": "https://github.com/ChimkuOp/ChimkuEnglishBot",
+    
+    "env": {
+        "BOT_TOKEN": {
+            "description": "telegram bot token here you can get it from https://t.me/BotFather",
+            "required": true,
+            "value": ""
+        },
+        "API_ID": {
+            "description": "telegram api id here you can get the value from telegram.org",
+            "required": true,
+            "value": ""
+        },
+        "API_HASH": {
+            "description": "telegram api hash from telegram.org",
+            "required": true,
+            "value": ""
+        },
+        "OWNER_ID": {
+            "description": "Owner's id",
+            "required" : true,
+            "value" : ""
+        },
+        "DB_URI": {
+            "description": "Your MongoDB connection string.",
+            "required": true,
+            "value": ""
+        },
+        "DB_NAME": {
+            "description": "Your MongoDB database name.",
+            "required": true,
+            "value": ""
+        }
+        
+    }
+}

@@ -1,3 +1,8 @@
-api_id = 28127918
-api_hash = "339b582adb4df367e4149be794eb527b"
-bot_token = "5672801003:AAHO1geQifGWAptq25ppcO7lOjuJuCkxbJQ"
+from os import getenv
+
+API_ID = int(getenv("API_ID", 69))
+API_HASH = getenv("API_HASH", None)
+BOT_TOKEN = getenv("BOT_TOKEN", None)
+DB_URI = getenv("DB_URI")
+DB_NAME = getenv("DB_NAME")
+OWNER_ID = int(getenv("OWNER_ID"))
