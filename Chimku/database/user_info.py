@@ -73,9 +73,12 @@ class USERS(MongoDB):
             )
     
     @staticmethod
-    def update_coin(link: str):
+    def update_coin(link: str , deduct: int = 0):
         coin = USERS.get_coin_by_link(link)
-        coin = int(coin)+1
+        if not deduct:
+            coin = int(coin) + 1
+        elif deduct:
+            coin = int(coin) - int(deduct) 
         with INSERTION_LOCK:
             collection = MongoDB(USERS.db_name)
             collection.update(

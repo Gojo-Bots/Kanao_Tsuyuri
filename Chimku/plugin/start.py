@@ -1,6 +1,7 @@
 from pyrogram.enums import ChatType as CT
 
 from Chimku import *
+from Chimku.database.stuffs import STUFF
 from Chimku.database.user_info import USERS
 
 
@@ -10,8 +11,10 @@ async def start_(c: bot, m: Message):
 
     if m.chat.type == CT.PRIVATE:
         await bot.send_message(m.chat.id, txt)
+        return
     else:
         await m.reply_text(txt)
+        return
 
 @bot.on_message(filters.command(["help"], pre))
 async def help_(c: bot, m: Message):
@@ -26,10 +29,15 @@ async def help_(c: bot, m: Message):
 
     `/profile` <user id | username> : To get you information.
 
-    **NOTE**: Your info will be stored in database when you type link in the group
+    **OWNER ONLY**
+    `/addfile` : To add file
+    `/rmfile` <link of the file>: To remove file
+
+    **NOTE**: Your info will be stored in database when you type `/link` in the group
 
     """
     await m.reply_text(txt)
+    return
 
 @bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot)
 async def link_(c: bot, m: Message):
@@ -86,6 +94,7 @@ async def u_info(c: bot, m: Message):
                     user = (await bot.get_users(split[1])).id
                 except Exception:
                     await m.reply_text("Unable to find user.")
+                    return
     elif m.reply_to_message:
         user = m.reply_to_message.from_user.id
     User = USERS(user).get_info()
@@ -106,10 +115,88 @@ async def u_info(c: bot, m: Message):
     else:
         await m.reply_text("No info available")
 
+@bot.on_message(filters.command(["addfile"], pre) & filters.private)
+async def file_adder(c: bot, m: Message):
+    if m.from_user.id != OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    Stuff = STUFF()
+    f_name = await bot.ask(
+        text="Send me the name of the file", 
+        chat_id = m.from_user.id,
+        filters=filters.text
+        )
+    f_name = str(f_name)
+    await f_name.request.edit_text("File name received")
+    f_link = await bot.ask(
+        text = "Send me the link of the file",
+        chat_id = m.from_user.id,
+        filters=filters.text
+        )
+    await f_link.request.edit_text("File link received")
+    while True:
+        f_coin = await bot.ask(
+            text = "Send me the amount of the file you want to set",
+            chat_id = m.from_user.id,
+            filters=filters.text
+            )
+        try:
+            f_coin = abs(int(f_coin))
+            if f_coin > 0:
+                f_coin.request.edit_text("File amount received")
+                break
+            else:
+                await f_coin.request.edit_text("Amount should not be 0")
+        except ValueError:
+            await f_coin.request.edit_text("Amount should be natural number")
+
+    txt = """
+    Send me type of the file you want to set available types:
+    Flamingo
+    Vistas
+    Grammar
+    Others
+    """
+    while True:
+        f_type = await bot.ask(
+            text = txt,
+            chat_id = m.from_user.id,
+            filters=filters.text
+            )
+        if str(f_type).lower() not in ["flamingo", "vistas", "grammar", "other"]:
+            await f_type.request.edit_text("Invalid file type")
+        elif str(f_type).lower() in ["flamingo", "vistas", "grammar", "other"]:
+            await f_type.request.edit_text("File type received")
+            break
+    
+    delete = await bot.send_message(m.from_user.id, "All value recieved initalizing database")
+
+    Stuff.add_file(f_name, f_link, f_coin, f_type)
+
+    await delete.delete(True)
+    await bot.send_message(m.from_user.id, "Added the file and it's info to db")
+
+@bot.on_message(filters.command(["rmfile"], pre) & filters.private)
+async def rm_file(c: bot, m: Message):
+    Stuff = STUFF
+    split = m.text.split(None,1)
+    if len(split) == 1:
+        await m.reply_text("USAGE : `/rmfile` <link of the file>")
+        return
+    link = split[1]
+    rm = Stuff.remove_file(link)
+    if rm:
+        await m.reply_text("Removed file")
+        return
+    else:
+        await m.reply_text("Unable to find file with corresponding link.")
+        return
+
 @bot.on_chat_member_updated(filters.new_chat_members)
 async def coin_increaser(c: bot, u: ChatMemberUpdated):
     link = u.invite_link
     if not link:
         return
     USERS.update_coin(str(link))
+    return
 

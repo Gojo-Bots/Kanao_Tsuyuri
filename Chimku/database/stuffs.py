@@ -12,7 +12,7 @@ class STUFF(MongoDB):
 
     def add_file(self, name: str, link: str, ncoin: int, dtype: str):
         with INSERTION_LOCK:
-            curr = self.find_one({"link" : link})
+            curr = self.find_one({"name" : name})
             if not curr:
                 self.insert_one(
                     {
@@ -40,5 +40,28 @@ class STUFF(MongoDB):
         if curr:
             file_name = {i["name"] for i in curr}
             return list(file_name)
+        else:
+            return False
+
+    def get_amount(self, name: str):
+        curr = self.find_one({"name" : name})
+        if curr:
+            amount = curr["ncoin"]
+            return amount
+        else:
+            return False
+
+    def get_file_link(self, name: str):
+        curr = self.find_one({"name" : name})
+        if curr:
+            s_link = curr["link"]
+            return s_link
+        else:
+            return False
+    
+    def get_file_info(self, name: str):
+        curr = self.find_one({"name" : name})
+        if curr:
+            return curr
         else:
             return False
