@@ -127,13 +127,13 @@ async def file_adder(c: bot, m: Message):
         filters=filters.text
         )
     f_name = str(f_name)
-    await f_name.request.edit_text("File name received")
+    await bot.send_message(m.from_user.id, "File name received")
     f_link = await bot.ask(
         text = "Send me the link of the file",
         chat_id = m.from_user.id,
         filters=filters.text
         )
-    await f_link.request.edit_text("File link received")
+    await bot.send_message(m.from_user.id, "File link received")
     while True:
         f_coin = await bot.ask(
             text = "Send me the amount of the file you want to set",
@@ -142,13 +142,13 @@ async def file_adder(c: bot, m: Message):
             )
         try:
             f_coin = abs(int(f_coin))
-            if f_coin > 0:
-                f_coin.request.edit_text("File amount received")
+            if f_coin:
+                await bot.send_message(m.from_user.id, "File amount received")
                 break
             else:
-                await f_coin.request.edit_text("Amount should not be 0")
+                await bot.send_message(m.from_user.id, "Amount should not be 0")
         except ValueError:
-            await f_coin.request.edit_text("Amount should be natural number")
+            await bot.send_message(m.from_user.id, "Amount should be natural number")
 
     txt = """
     Send me type of the file you want to set available types:
@@ -164,17 +164,16 @@ async def file_adder(c: bot, m: Message):
             filters=filters.text
             )
         if str(f_type).lower() not in ["flamingo", "vistas", "grammar", "other"]:
-            await f_type.request.edit_text("Invalid file type")
+            await bot.send_message(m.from_user.id, "Invalid file type")
         elif str(f_type).lower() in ["flamingo", "vistas", "grammar", "other"]:
-            await f_type.request.edit_text("File type received")
+            await bot.send_message(m.from_user.id, "File type received")
             break
     
-    delete = await bot.send_message(m.from_user.id, "All value recieved initalizing database")
+    edit = await bot.send_message(m.from_user.id, "All value recieved initalizing database")
 
     Stuff.add_file(f_name, f_link, f_coin, f_type)
 
-    await delete.delete(True)
-    await bot.send_message(m.from_user.id, "Added the file and it's info to db")
+    await bot.edit_message_text(m.from_user.id, edit.id, "Added the file and it's info to db")
 
 @bot.on_message(filters.command(["rmfile"], pre) & filters.private)
 async def rm_file(c: bot, m: Message):
