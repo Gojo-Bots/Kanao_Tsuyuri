@@ -1,6 +1,6 @@
 from threading import RLock
 
-from Chimku.database import MongoDB
+from Powers.database import MongoDB
 
 INSERTION_LOCK = RLock()
 

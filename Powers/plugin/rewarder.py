@@ -1,17 +1,17 @@
 from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
-from Chimku import *
-from Chimku.database.stuffs import STUFF
-from Chimku.database.user_info import USERS
-from Chimku.utils.keyboard import *
+from Powers import *
+from Powers.database.stuffs import STUFF
+from Powers.database.user_info import USERS
+from Powers.utils.keyboard import *
 
 Stuff = STUFF()
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre))
 async def rewards(c: bot, m: Message):
     txt = "What you want to buy"
-    await m.reply_text(txt, reply_markup=IKM(initial))
+    await m.reply_text(txt, reply_markup=initial_kb())
     return
 
 @bot.on_callback_query(filters.private)
@@ -46,7 +46,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         try:
             await q.edit_message_text(
                 "What you want to buy",
-                reply_markup=IKM(initial)
+                reply_markup=initial_kb()
             )
             await q.answer("Initial menu")
             return
@@ -57,7 +57,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         try:
             caption = q.message.text.split(None)
             for i in caption:
-                if i.lower in ["flamingo", "vistas", "grammar", "other"]:
+                if i.lower() in Category:
                     need = i.lower()
             is_present, key = stuff_kb(need)
             if is_present:
@@ -82,7 +82,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         u_link = str(user["link"])
         u_coin = int(user["coin"])
         caption = q.message.text.split(":")
-        name = caption[1].trip().split("\n")[0]
+        name = caption[1].strip().split("\n")[0]
         s_coin = int(Stuff.get_amount(name))
         s_link = str(Stuff.get_file_link(name))
         if u_coin >= s_coin:

@@ -4,7 +4,7 @@ from pyrogram.types import ChatMemberUpdated, Message
 
 from KeysSecret import *
 
-plugin = dict(root="Chimku.plugin")
+plugin = dict(root="Powers.plugin")
 bot = Client(
     "bot",
     api_id=API_ID,

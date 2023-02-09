@@ -1,7 +1,7 @@
 {
-    "name": "ChimkuEnglishBot",
+    "name": "Member Adder",
     "description": "A telegram bot to find the files on the channel or group",
-    "repository": "https://github.com/ChimkuOp/ChimkuEnglishBot",
+    "repository": "https://github.com/Gojo-Bots/Member_adder",
     
     "env": {
         "BOT_TOKEN": {
@@ -33,6 +33,21 @@
             "description": "Your MongoDB database name.",
             "required": true,
             "value": ""
+        },
+        "CATEGORY": {
+            "description": "Name of initial category your want to divide the rewards in. Seprate them by space. If you have a value which have space between them seprate them using _",
+            "required": true,
+            "value": ""
+        },
+        "NUMBER_CATEGORY": {
+            "description": "Number of rows you want in category inline",
+            "required": false,
+            "value": "3"
+        },
+        "NUMBER_SUBCATEGORY": {
+            "description": "Number of rows you want in category inline",
+            "required": false,
+            "value": "3"
         }
         
     }

@@ -16,6 +16,12 @@
 
 `DB_URI` Your [MongoDB](https://www.mongodb.com/) connection string.
 
+`CATEGORY` Name of initial category your want to divide the rewards in. Seprate them by space. If you have a value which have space between them seprate them using _
+
+`NUMBER_CATEGORY` Number of rows you want in category inline
+
+`NUMBER_SUBCATEGORY` Number of rows you want in category inline
+
 
 
 # Powered by [ɢօʝօ ɮօȶֆ](https://github.com/Gojo-Bots)

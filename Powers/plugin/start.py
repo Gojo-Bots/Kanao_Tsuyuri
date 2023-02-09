@@ -1,8 +1,8 @@
 from pyrogram.enums import ChatType as CT
 
-from Chimku import *
-from Chimku.database.stuffs import STUFF
-from Chimku.database.user_info import USERS
+from Powers import *
+from Powers.database.stuffs import STUFF
+from Powers.database.user_info import USERS
 
 
 @bot.on_message(filters.command(["start"], pre))
@@ -150,22 +150,19 @@ async def file_adder(c: bot, m: Message):
         except ValueError:
             await bot.send_message(m.from_user.id, "Amount should be natural number")
 
-    txt = """
-    Send me type of the file you want to set available types:
-    Flamingo
-    Vistas
-    Grammar
-    Others
-    """
+    txt = "Send me type of the file you want to set available types:\n"
+    for i in Category:
+        txt += f"\n{i}\n"
+    txt += "\n If the file name contains space between them seprate them using **_**"
     while True:
         f_type = await bot.ask(
             text = txt,
             chat_id = m.from_user.id,
             filters=filters.text
             )
-        if str(f_type).lower() not in ["flamingo", "vistas", "grammar", "other"]:
+        if str(f_type).lower() not in Category:
             await bot.send_message(m.from_user.id, "Invalid file type")
-        elif str(f_type).lower() in ["flamingo", "vistas", "grammar", "other"]:
+        elif str(f_type).lower() in Category:
             await bot.send_message(m.from_user.id, "File type received")
             break
     
