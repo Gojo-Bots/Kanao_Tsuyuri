@@ -89,7 +89,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.edit_message_reply_markup(IKM(purchased))
             try:
                 edit = await q.message.reply_document(s_link)
-                USERS.update_coin(u_link, deduct=s_coin)
+                USERS.update_coin(u_link, deduct=True)
                 await q.answer("Successfully pruchased")
                 await edit.reply_text("Here is your delivery.")
                 return

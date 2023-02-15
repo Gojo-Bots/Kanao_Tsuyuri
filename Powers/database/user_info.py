@@ -1,5 +1,6 @@
 from threading import RLock
 
+from KeysSecret import AMOUNT
 from Powers.database import MongoDB
 
 INSERTION_LOCK = RLock()
@@ -73,10 +74,10 @@ class USERS(MongoDB):
             )
     
     @staticmethod
-    def update_coin(link: str , deduct: int = 0):
+    def update_coin(link: str , deduct: bool = False):
         coin = USERS.get_coin_by_link(link)
         if not deduct:
-            coin = int(coin) + 1
+            coin = int(coin) + int(AMOUNT)
         elif deduct:
             coin = int(coin) - int(deduct) 
         with INSERTION_LOCK:

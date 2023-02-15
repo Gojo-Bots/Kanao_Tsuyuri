@@ -18,3 +18,5 @@ C = getenv("CATEGORY").split(None) # Don't remove this line
 Category = [i.strip().lower() for i in C]
 No_cat = int(getenv("NUMBER_CATEGORY", 3))
 No_sub_cat = int(getenv("NUMBER_SUBCATEGORY", 3))
+AMOUNT = int(getenv("AMOUNT", 5))
+CHAT_ID = getenv("CHAT_ID", None)

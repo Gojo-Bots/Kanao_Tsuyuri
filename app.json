@@ -48,6 +48,16 @@
             "description": "Number of rows you want in category inline",
             "required": false,
             "value": "3"
+        },
+        "AMOUNT": {
+            "description": "Amount which should be given to the user when someonejoins via their link",
+            "required": false,
+            "value": "5"
+        },
+        "CHAT_ID": {
+            "description": "Id of the chat in which you want to add member. Support only one at this time. Pass only one chat id",
+            "required": true,
+            "value": ""
         }
         
     }

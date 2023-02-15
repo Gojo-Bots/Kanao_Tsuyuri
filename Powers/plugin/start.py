@@ -1,5 +1,6 @@
 from pyrogram.enums import ChatType as CT
 
+from KeysSecret import CHAT_ID
 from Powers import *
 from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
@@ -39,7 +40,7 @@ async def help_(c: bot, m: Message):
     await m.reply_text(txt)
     return
 
-@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot)
+@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot & filters.chat(CHAT_ID))
 async def link_(c: bot, m: Message):
     try:
         await bot.send_message(m.from_user.id, "Genrating your link...")
@@ -52,7 +53,10 @@ async def link_(c: bot, m: Message):
         return
     if not is_user:
         try:
-            c_link = await bot.create_chat_invite_link("Lowde_ka_channel")
+            if len(CHAT_ID) == 1:
+                c_link = await bot.create_chat_invite_link(int(CHAT_ID))
+            else:
+                c_link = await bot.create_chat_invite_link(int(CHAT_ID))
         except Exception as e:
             await m.reply_text("Failed to create chat invite link")
         User = USERS(m.from_user.id)
