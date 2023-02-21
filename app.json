@@ -58,6 +58,16 @@
             "description": "Id of the chat in which you want to add member. Support only one at this time. Pass only one chat id",
             "required": true,
             "value": ""
+        },
+        "PREMIUM_CHANNEL": {
+            "description": "Id of the premium channel",
+            "required": false,
+            "value": ""
+        },
+        "PREMIUM_COST": {
+            "description": "Cost of premium channel's link. Default to 50",
+            "required": false,
+            "value": "50"
         }
         
     }

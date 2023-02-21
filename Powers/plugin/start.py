@@ -1,6 +1,6 @@
 from pyrogram.enums import ChatType as CT
 
-from KeysSecret import CHAT_ID
+from KeysSecret import *
 from Powers import *
 from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
@@ -29,6 +29,10 @@ async def help_(c: bot, m: Message):
     `/mylink` : To get previous genrated link of the chat by you.
 
     `/profile` <user id | username> : To get you information.
+
+    `/premium`: To get link of premium channel. Works only in private chat
+
+    `buy` : To buy stuffs. Works only in private chat
 
     **OWNER ONLY**
     `/addfile` : To add file
@@ -191,6 +195,8 @@ async def rm_file(c: bot, m: Message):
     else:
         await m.reply_text("Unable to find file with corresponding link.")
         return
+
+
 
 @bot.on_chat_member_updated(filters.new_chat_members)
 async def coin_increaser(c: bot, u: ChatMemberUpdated):

@@ -2,7 +2,7 @@ from pykeyboard import InlineButton as ib
 from pykeyboard import InlineKeyboard as ikb
 from pyrogram.types import InlineKeyboardButton as KB
 
-from KeysSecret import Category, No_cat, No_sub_cat
+from KeysSecret import *
 from Powers.database.stuffs import STUFF
 
 stuff = STUFF()
@@ -14,6 +14,10 @@ def initial_kb():
             key.add(
                 ib(str(i.replace("_", " ")).capitalize(), str(i.lower()))
                 )
+    key.add(
+        ib("Premium Channel", "premium_link"),
+        ib("Close", "close") 
+    )
     return key
 
 def stuff_kb(needed: str):

@@ -1,4 +1,4 @@
-from pyrogram.types import CallbackQuery
+from pyrogram.types import CallbackQuery, InlineKeyboardButton
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
 from Powers import *
@@ -8,7 +8,7 @@ from Powers.utils.keyboard import *
 
 Stuff = STUFF()
 
-@bot.on_message(filters.command(["myreward", "reward", "buy"], pre))
+@bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
 async def rewards(c: bot, m: Message):
     txt = "What you want to buy"
     await m.reply_text(txt, reply_markup=initial_kb())
@@ -100,8 +100,43 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.answer("You don't have enough coin", True)
             return
 
-    
+@bot.on_message(filters.command(["premium"], pre) & filters.private) 
+async def premium_channel(c: bot, m: Message):
+    u_id = m.from_user.id
+    Users = USERS(u_id).get_info()
+    u_coin = int(Users["coin"])
+    if u_coin >= PREMIUM_COST:
+        c_link = await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)
+        join_chat = IKM(
+            [[
+                InlineKeyboardButton("Click here to join", url=f"{c_link}")
+            ]]
+        )
+        await m.reply_text(f"Here is the invite link for the premium channel:\n{['Click Here'](c_link)}", reply_markup=join_chat)
+        return
+    else:
+        await m.reply_text(
+            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n Premium chat cost: {PREMIUM_COST}\nYou have: {u_coin}")
+        return
 
+@bot.on_callback_query(filters.regex("^premium_link$"))
+async def premium_link(c: bot, q: CallbackQuery):
+    u_id = q.from_user.id
+    Users = USERS(u_id).get_info()
+    u_coin = int(Users["coin"])
+    if u_coin >= PREMIUM_COST:
+        c_link = await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)
+        join_chat = IKM(
+            [[
+                InlineKeyboardButton("Click here to join", url=f"{c_link}")
+            ]]
+        )
+        await q.message.reply_text(f"Here is the invite link for the premium channel:\n{['Click Here'](c_link)}", reply_markup=join_chat)
+        return
+    else:
+        await q.message.reply_text(
+            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n Premium chat cost: {PREMIUM_COST}\nYou have: {u_coin}")
+        return
 
 @bot.on_callback_query(filters.regex("^call_") & filters.private)
 async def buy_menu(c: bot, q: CallbackQuery):

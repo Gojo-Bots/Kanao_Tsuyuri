@@ -22,6 +22,10 @@
 
 `NUMBER_SUBCATEGORY` Number of rows you want in category inline
 
+`PREMIUM_CHANNEL` Id of the premium channel
+
+`PREMIUM_COST` Cost of premium channel's link. Default to 50
+
 
 
 # Powered by [ɢօʝօ ɮօȶֆ](https://github.com/Gojo-Bots)
