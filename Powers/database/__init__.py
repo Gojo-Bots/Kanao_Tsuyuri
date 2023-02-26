@@ -13,8 +13,8 @@ except PyMongoError as f:
 main_db = db_client[DB_NAME]
 
 class MongoDB:
-    def __init__(self) -> None:
-        self.collection = main_db["test"]
+    def __init__(self, collection) -> None:
+        self.collection = main_db[collection]
 
     def insert_one(self, document):
         result = self.collection.insert_one(document)
