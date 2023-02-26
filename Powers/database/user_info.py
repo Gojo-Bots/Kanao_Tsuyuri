@@ -9,7 +9,7 @@ class USERS(MongoDB):
     db_name = "users"
 
     def __init__(self, user_id: int):
-        super.__init__(self.db_name)
+        super().__init__(self.db_name)
         self.user_id = user_id
 
     @staticmethod
