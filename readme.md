@@ -1,6 +1,6 @@
 # About:
 * This bot will give the coin to the user when someone joins the gc with their fetched link.
-* Will add some more feture to the bot like giving more access to the deployer.
+
 
 
 # Variables
