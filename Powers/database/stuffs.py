@@ -8,7 +8,7 @@ class STUFF(MongoDB):
     db_name = "stuff"
 
     def __init__(self):
-        super.__init__(self.db_name)
+        super().__init__(self.db_name)
 
     def add_file(self, name: str, link: str, ncoin: int, dtype: str):
         with INSERTION_LOCK:
