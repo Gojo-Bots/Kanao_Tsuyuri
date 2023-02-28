@@ -131,6 +131,7 @@ async def file_adder(c: bot, m: Message):
     Stuff = STUFF()
     f_name = await bot.ask(
         text="Send me the name of the file", 
+        identifier = (m.chat.id, m.from_user.id, m.id),
         chat_id = m.from_user.id,
         filters=filters.text
         )
@@ -138,7 +139,7 @@ async def file_adder(c: bot, m: Message):
     await bot.send_message(m.from_user.id, "File name received")
     f_link = await bot.ask(
         text = "Send me the link of the file",
-        identifier = (m.chat.id),
+        identifier = (m.chat.id, m.from_user.id, m.id),
         chat_id = m.from_user.id,
         filters=filters.text
         )
@@ -146,7 +147,7 @@ async def file_adder(c: bot, m: Message):
     while True:
         f_coin = await bot.ask(
             text = "Send me the amount of the file you want to set",
-            identifier = (m.chat.id),
+            identifier = (m.chat.id, m.from_user.id, m.id),
             chat_id = m.from_user.id,
             filters=filters.text
             )
@@ -167,7 +168,7 @@ async def file_adder(c: bot, m: Message):
     while True:
         f_type = await bot.ask(
             text = txt,
-            identifier = (m.chat.id),
+            identifier = (m.chat.id, m.from_user.id, m.id),
             chat_id = m.from_user.id,
             filters=filters.text
             )
