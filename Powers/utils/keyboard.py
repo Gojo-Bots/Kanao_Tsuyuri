@@ -7,13 +7,25 @@ from Powers.database.stuffs import STUFF
 
 stuff = STUFF()
 
+
+yes_no = [[
+    KB("Yes", "new_yus"),
+    KB("No", "new_noi")
+]]
+
 def initial_kb():
+    Category = CATEGORY
+    for i in list(stuff.file_sorted()):
+        Category.append(i)
     key = ikb(No_cat)
     if Category:
         for i in Category:
-            key.add(
-                ib(str(i.replace("_", " ")).capitalize(), str(i.lower()))
-                )
+            if i.strip("_") == 2:
+                key.add(
+                    ib(str(i.replace("_", " ")).capitalize(), str(i.lower()))
+                    )
+            else:
+                key.add(ib(str(i.capitalize()), str(i.lower())))
     key.add(
         ib("Premium Channel", "premium_link"),
         ib("Close", "close") 

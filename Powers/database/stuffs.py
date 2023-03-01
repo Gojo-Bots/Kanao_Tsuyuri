@@ -25,7 +25,10 @@ class STUFF(MongoDB):
                 return
             else:
                 return False
-    
+    def file_sorted(self):
+        with INSERTION_LOCK:
+            curr = self.sort_by()
+            return set(curr)
     def remove_file(self, link: str):
         with INSERTION_LOCK:
             curr = self.find_one({"link" : link})

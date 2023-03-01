@@ -15,7 +15,10 @@ DB_URI = getenv("DB_URI")
 DB_NAME = getenv("DB_NAME")
 OWNER_ID = int(getenv("OWNER_ID"))
 C = getenv("CATEGORY").split(None) # Don't remove this line
-Category = [i.strip().lower() for i in C]
+x = []
+for i in C:
+    x.append(i.strip().lower())
+CATEGORY = x
 No_cat = int(getenv("NUMBER_CATEGORY", 3))
 No_sub_cat = int(getenv("NUMBER_SUBCATEGORY", 3))
 AMOUNT = int(getenv("AMOUNT", 5))

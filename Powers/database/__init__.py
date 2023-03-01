@@ -1,6 +1,6 @@
 from sys import exit as exiter
 
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from pymongo.errors import PyMongoError
 
 from KeysSecret import DB_NAME, DB_URI
@@ -55,3 +55,10 @@ class MongoDB:
         result = self.collection.update_one(query, {"$set": update})
         new_document = self.collection.find_one(query)
         return result.modified_count, new_document
+    
+    def sort_by(self):
+        set_sorted = set()
+        sort = self.collection.find()
+        for i in sort:
+            set_sorted.add(i['type'])
+        return list(set_sorted)

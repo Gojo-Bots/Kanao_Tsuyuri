@@ -1,4 +1,4 @@
-import pyromod
+import pyroaddon
 from pyrogram import Client, filters
 from pyrogram.types import ChatMemberUpdated, Message
 

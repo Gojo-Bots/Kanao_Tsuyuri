@@ -57,6 +57,16 @@ class USERS(MongoDB):
                 return coins
             else:
                 return False
+    @staticmethod
+    def get_joined_by_link(link: str):
+        with INSERTION_LOCK:
+            collection = MongoDB(USERS.db_name)
+            curr = collection.find_one({"link": link})
+            if curr:
+                joined = curr["joined"]
+                return joined
+            else:
+                return False
     
     def get_info(self):
         with INSERTION_LOCK:
@@ -68,16 +78,16 @@ class USERS(MongoDB):
 
     def update_link(self, link: str):
         with INSERTION_LOCK:
-            curr = self.update(
+            self.update(
                 {"user_id" : self.user_id},
                 {"link" : link}
             )
     
     @staticmethod
-    def update_coin(link: str , deduct: bool = False):
+    def update_coin(link: str , amount:int ,deduct: bool = False):
         coin = USERS.get_coin_by_link(link)
         if not deduct:
-            coin = int(coin) + int(AMOUNT)
+            coin = int(coin) + int(amount)
         elif deduct:
             coin = int(coin) - int(deduct) 
         with INSERTION_LOCK:
@@ -85,4 +95,14 @@ class USERS(MongoDB):
             collection.update(
                 {"link" : link},
                 {"coin" : int(coin)}
+                )
+    @staticmethod
+    def update_joined(link: str):
+        join = USERS.get_joined_by_link(link)
+        joined = int(join) + 1
+        with INSERTION_LOCK:
+            collection = MongoDB(USERS.db_name)
+            collection.update(
+                {"link" : link},
+                {"joined" : int(joined)}
                 )

@@ -1,5 +1,5 @@
 pykeyboard==0.1.5
 pymongo==4.3.3
-pyromod==1.5
-pyrogram==2.0.24
+pyromod==2.0.0
+pyrogram==2.0.100
 tgcrypto==1.2.5
