@@ -50,10 +50,10 @@ def initial_kb():
 
 def stuff_kb(needed: str):
     req = needed.lower()
-    media_kb = []
     files = STUFF().get_files(req)
-    x = arranger_kb(list(files))
-    if x:
+    if files:
+        media_kb = []
+        x = arranger_kb(list(files))
         for i in x:
             line = []
             for j in i:
@@ -67,16 +67,18 @@ def stuff_kb(needed: str):
                     )
             media_kb.append(line)
         media_kb.extend(
-            [
-            [KB("Back", "back")],
-            [KB("Close", "close")]
-            ]
+            [[
+            KB("Back", "back"),
+            KB("Close", "close")
+            ]]
         )
         return True, IKM(media_kb)
     else:
-        media_kb.extend[
-            [KB("Back", "back")], # This back will genrate initial menu
-            [KB("Close", "close")]
+        media_kb = [
+            [
+                KB("Back", "back"), # This back will genrate initial menu
+                KB("Close", "close")
+            ]
             ]
         return False, IKM(media_kb)
 
