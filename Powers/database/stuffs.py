@@ -12,6 +12,7 @@ class STUFF(MongoDB):
 
     def add_file(self, name: str, link: str, ncoin: int, dtype: str):
         with INSERTION_LOCK:
+            name = name.lower()
             curr = self.find_one({"name" : name})
             if not curr:
                 self.insert_one(
@@ -22,7 +23,7 @@ class STUFF(MongoDB):
                         "type": dtype
                     }
                 )
-                return
+                return True
             else:
                 return False
     def file_sorted(self):
@@ -41,8 +42,8 @@ class STUFF(MongoDB):
     def get_files(self, type: str):
         curr = self.find_all({"type" : type})
         if curr:
-            file_name = {i["name"] for i in curr}
-            return list(file_name)
+            file_name = [i["name"] for i in curr]
+            return file_name
         else:
             return False
 
@@ -55,6 +56,7 @@ class STUFF(MongoDB):
             return False
 
     def get_file_link(self, name: str):
+        name = name.lower()
         curr = self.find_one({"name" : name})
         if curr:
             s_link = curr["link"]
@@ -63,8 +65,10 @@ class STUFF(MongoDB):
             return False
     
     def get_file_info(self, name: str):
+        name = name.lower()
         curr = self.find_one({"name" : name})
         if curr:
+            print(curr)
             return curr
         else:
             return False

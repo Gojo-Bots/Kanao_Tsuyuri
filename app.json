@@ -20,8 +20,13 @@
             "value": ""
         },
         "OWNER_ID": {
-            "description": "Owner's id",
+            "description": "Owner's id.",
             "required" : true,
+            "value" : ""
+        },
+        "SUDO": {
+            "description": "Sudoers id. Have same powers as owner. Seprate multiple value with space",
+            "required" : false,
             "value" : ""
         },
         "DB_URI": {

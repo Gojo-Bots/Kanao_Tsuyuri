@@ -10,7 +10,9 @@
 
 `API_HASH` You can get your api hash [here](my.telegram.org)
 
-`OWNER_ID` Your telegram user id
+`OWNER_ID` Your telegram user id.
+
+`SUDO` Sudoers id. Have same powers as owner. Seprate multiple value with space
 
 `DB_NAME` Your [MongoDB](https://www.mongodb.com/) name
 

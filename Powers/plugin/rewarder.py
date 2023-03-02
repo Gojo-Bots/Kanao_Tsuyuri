@@ -15,11 +15,11 @@ async def rewards(c: bot, m: Message):
     await m.reply_text(txt, reply_markup=initial_kb())
     return
 
-@bot.on_callback_query()
+@bot.on_callback_query(filters.regex("^buy_"), 0)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
-    call = str(q.data)
+    call = str(q.data).split("_")[1]
     try:
         is_present, key = stuff_kb(call)
         if is_present:
@@ -28,15 +28,23 @@ async def initial_call(c: bot, q: CallbackQuery):
                 reply_markup=key)
             await q.answer("Buy menu")   
             return
-        elif not is_present:
+        else:
             await q.edit_message_text(
                 f"Nothing to buy here.", 
                 reply_markup=key)
             await q.answer("Buy menu")
             return
     except Exception as e:
-        await q.message.reply_text("Failed to make keyboard. Or edit Message")
+        await q.message.reply_text(f"Failed to make keyboard. Or edit Message due to\n{e}")
+        print(e)
         return
+
+
+@bot.on_callback_query(group=1)
+async def initial_call(c: bot, q: CallbackQuery):
+    if q.message.chat.type != CT.PRIVATE:
+        return
+    call = str(q.data)
     if call == "close":
         try:
             await q.answer("Closing")
@@ -44,6 +52,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             return
         except Exception as e:
             await q.message.reply_text("Failed to close menu")
+            print(e)
             return
     if call == "back":
         try:
@@ -54,7 +63,8 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.answer("Initial menu")
             return
         except Exception as e:
-            await q.message.reply_text("Failed to change the menu")
+            await q.edit_message_text(f"Failed to change the menu due to\n{e}")
+            print(e)
             return
     if call == "bback":
         try:
@@ -76,8 +86,9 @@ async def initial_call(c: bot, q: CallbackQuery):
                 reply_markup=key)
             await q.answer("Buy menu")
             return
-        except Exception:
-            await q.message.reply_text("Failed to change the menu")
+        except Exception as e:
+            await q.message.reply_text(f"Failed to change the menu due to\n{e}")
+
             return
     if call == "purchase":
         User = USERS(q.from_user.id)
@@ -96,8 +107,9 @@ async def initial_call(c: bot, q: CallbackQuery):
                 await q.answer("Successfully pruchased")
                 await edit.reply_text("Here is your delivery.")
                 return
-            except Exception:
+            except Exception as e:
                 await q.message.reply_text("Failed to buy")
+                print(e)
                 return
         else:
             await q.answer("You don't have enough coin", True)
@@ -122,7 +134,7 @@ async def premium_channel(c: bot, m: Message):
             f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}")
         return
 
-@bot.on_callback_query(filters.regex("^premium_link$"))
+@bot.on_callback_query(filters.regex("^premium_link$"), 3)
 async def premium_link(c: bot, q: CallbackQuery):
     u_id = q.from_user.id
     Users = USERS(u_id).get_info()
@@ -132,29 +144,41 @@ async def premium_link(c: bot, q: CallbackQuery):
         join_chat = IKM(
             [[
                 InlineKeyboardButton("Click here to join", url=f"{c_link}")
+            ],
+            [
+                InlineKeyboardButton("Back", "back"),
+                InlineKeyboardButton("Close", "close")
             ]]
         )
-        await q.message.edit_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
+        await q.edit_message_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
         return
     else:
-        await q.message.edit_text(
-            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}")
+        back_btn = IKM(
+            [
+                [
+                    InlineKeyboardButton("Back", "back"),
+                    InlineKeyboardButton("Close", "close")
+                ]
+            ]
+        )
+        await q.edit_message_text(
+            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}", reply_markup=back_btn)
         return
 
-@bot.on_callback_query(filters.regex("^call_"))
+@bot.on_callback_query(filters.regex("^call_file_"), 2)
 async def buy_menu(c: bot, q: CallbackQuery):
     if not q.message.chat.type != CT.PRIVATE:
         return
-    data = q.data.split("_", 1)[1]
+    data = q.data.split("_")[-1]
     name = str(data).replace("_", " ")
     file = Stuff.get_file_info(name)
-    f_name = file["name"]
+    f_name = file["name"].lower().capitalize()
     amount = file["ncoin"]
     f_category = file["type"]
     txt = f"""
-    Name : {f_name}
-    CATEGORY : {f_category}
-    Amount : {amount}
+Name : {f_name}
+CATEGORY : {f_category}
+Amount : {amount}
     """
     key = purchase_kb()
     await q.edit_message_text(txt, reply_markup=key)

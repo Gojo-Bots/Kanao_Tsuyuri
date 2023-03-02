@@ -13,7 +13,11 @@ API_HASH = getenv("API_HASH", None)
 BOT_TOKEN = getenv("BOT_TOKEN", None)
 DB_URI = getenv("DB_URI")
 DB_NAME = getenv("DB_NAME")
-OWNER_ID = int(getenv("OWNER_ID"))
+OWNER = {int(i) for i in getenv("OWNER_ID")}
+SUDO = list({int(i) for i in getenv("SUDO")})
+OWNER_ID = []
+OWNER_ID.append(OWNER)
+OWNER_ID.extend(SUDO)
 C = getenv("CATEGORY").split(None) # Don't remove this line
 x = []
 for i in C:
