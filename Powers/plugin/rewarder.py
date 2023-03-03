@@ -7,7 +7,7 @@ from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
 
-Stuff = STUFF()
+
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
 async def rewards(c: bot, m: Message):
@@ -24,7 +24,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         is_present, key = stuff_kb(call)
         if is_present:
             await q.edit_message_text(
-                f"Want you want to buy in {call.capitalize()} section", 
+                f"What you want to buy in {call.capitalize()} section", 
                 reply_markup=key)
             await q.answer("Buy menu")   
             return
@@ -44,6 +44,7 @@ async def initial_call(c: bot, q: CallbackQuery):
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
+    Stuff = STUFF()
     call = str(q.data)
     if call == "close":
         try:
@@ -75,7 +76,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             is_present, key = stuff_kb(need)
             if is_present:
                 await q.edit_message_text(
-                    f"Want you want to buy in {need} section",
+                    f"What you want to buy in {need} section",
                     reply_markup=key
                 )
                 await q.answer("Buy menu")
@@ -98,14 +99,23 @@ async def initial_call(c: bot, q: CallbackQuery):
         caption = q.message.text.split(":")
         name = caption[1].strip().split("\n")[0]
         s_coin = int(Stuff.get_amount(name))
-        s_link = str(Stuff.get_file_link(name))
+        s_file = str(Stuff.get_file_link(name)[0])
+        s_type = str(Stuff.get_file_link(name)[1])
         if u_coin >= s_coin:
             await q.edit_message_reply_markup(IKM(purchased))
             try:
-                edit = await q.message.reply_document(s_link)
-                USERS.update_coin(u_link, deduct=True)
+                if s_type == "document":
+                    await q.message.reply_document(s_file, caption="Here is your delivery")
+                elif s_type == "video":
+                    await q.message.reply_video(s_file, caption="Here is your delivery")
+                elif s_type == "photo":
+                    await q.message.reply_photo(s_file, caption="Here is your delivery")
+                elif s_type == "video_note":
+                    await q.message.reply_video_note(s_file, caption="Here is your delivery")
+                elif s_type == "animation":
+                    await q.message.reply_animation(s_file, caption="Here is your delivery")
+                    USERS.update_coin(u_link, deduct=True)
                 await q.answer("Successfully pruchased")
-                await edit.reply_text("Here is your delivery.")
                 return
             except Exception as e:
                 await q.message.reply_text("Failed to buy")
@@ -165,11 +175,12 @@ async def premium_link(c: bot, q: CallbackQuery):
             f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}", reply_markup=back_btn)
         return
 
-@bot.on_callback_query(filters.regex("^call_file_"), 2)
+@bot.on_callback_query(filters.regex("^call_"), 2)
 async def buy_menu(c: bot, q: CallbackQuery):
-    if not q.message.chat.type != CT.PRIVATE:
+    if q.message.chat.type != CT.PRIVATE:
         return
-    data = q.data.split("_")[-1]
+    Stuff = STUFF()
+    data = q.data.split("_",1)[-1]
     name = str(data).replace("_", " ")
     file = Stuff.get_file_info(name)
     f_name = file["name"].lower().capitalize()

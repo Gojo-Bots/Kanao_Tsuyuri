@@ -59,7 +59,7 @@ def stuff_kb(needed: str):
             for j in i:
                 if j.split(None):
                     line.append(
-                        initial_kb_gen(str(j).capitalize(), f"call_file_{str(j).lower().replace(' ', '_')}")
+                        initial_kb_gen(str(j).capitalize(), f"call_{str(j).lower().replace(' ', '_')}")
                     )
                 elif not j.split(None):
                     line.append(
@@ -95,9 +95,7 @@ def purchase_kb():
 
 purchased = [
     [
-        KB("Back", "bback")
-    ],
-    [
+        KB("Back", "bback"),
         KB("Close", "close")
     ]
 ]

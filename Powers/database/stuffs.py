@@ -10,7 +10,7 @@ class STUFF(MongoDB):
     def __init__(self):
         super().__init__(self.db_name)
 
-    def add_file(self, name: str, link: str, ncoin: int, dtype: str):
+    def add_file(self, name: str, f_id: int, ncoin: int, dtype: str, file_type: str):
         with INSERTION_LOCK:
             name = name.lower()
             curr = self.find_one({"name" : name})
@@ -18,9 +18,10 @@ class STUFF(MongoDB):
                 self.insert_one(
                     {
                         "name": name,
-                        "link": link,
+                        "f_id": f_id,
                         "ncoin": ncoin,
-                        "type": dtype
+                        "type": dtype,
+                        "file_type": file_type
                     }
                 )
                 return True
@@ -30,9 +31,9 @@ class STUFF(MongoDB):
         with INSERTION_LOCK:
             curr = self.sort_by()
             return set(curr)
-    def remove_file(self, link: str):
+    def remove_file(self, f_id: str):
         with INSERTION_LOCK:
-            curr = self.find_one({"link" : link})
+            curr = self.find_one({"f_id" : f_id})
             if curr:
                 self.delete_one(curr)
                 return True
@@ -59,8 +60,8 @@ class STUFF(MongoDB):
         name = name.lower()
         curr = self.find_one({"name" : name})
         if curr:
-            s_link = curr["link"]
-            return s_link
+            s_f_id = [curr["f_id"], curr["file_type"]]
+            return s_f_id
         else:
             return False
     
@@ -68,7 +69,6 @@ class STUFF(MongoDB):
         name = name.lower()
         curr = self.find_one({"name" : name})
         if curr:
-            print(curr)
             return curr
         else:
             return False

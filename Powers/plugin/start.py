@@ -22,30 +22,30 @@ async def start_(c: bot, m: Message):
 @bot.on_message(filters.command(["help"], pre))
 async def help_(c: bot, m: Message):
     txt = """
-Type `/link` in the chat to get invite link of the chat.
+Type /link in the chat to get invite link of the chat.
 Per join with you link will reward you some coin, which will further used to buy stuffs.
 
 Note that every /link will command will update the link you have created before in db
 and the user joined by that link will not considered as any base to give reward to you
 
-`/mylink` : To get previous genrated link of the chat by you.
+/mylink : To get previous genrated link of the chat by you.
 
-`/profile` <user id | username> : To get you information.
+/profile <user id | username> : To get you information.
 
-`/owners` : Get info of owners
+/owners : Get info of owners
 
-`/premium`: To get link of premium channel. Works only in private chat
+/premium: To get link of premium channel. Works only in private chat
 
-`/buy` : To buy stuffs. Works only in private chat
+/buy : To buy stuffs. Works only in private chat
 
 **OWNER ONLY**
-`/addfile` : To add file
-`/rmfile` <link of the file>: To remove file
-`/addcat` <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
-`/addowner` <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
-`/rmowner` <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)`
+/addfile : To add file
+/rmfile <id of the file>: To remove file
+/addcat <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
+/addowner <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
+/rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)`
 
-**NOTE**: Your info will be stored in database when you type `/link` in the group
+**NOTE**: Your info will be stored in database when you type /link in the group
 
 **db** standas for **DataBase**
 """
@@ -170,7 +170,7 @@ async def u_link(c: bot, m: Message):
     if link:
         await m.reply_text(f"Here is your link:\n`{link}`")
         return
-    await m.reply_text("Seems link you are not registered in my db\nType `/link` to get registered")
+    await m.reply_text("Seems link you are not registered in my db\nType /link to get registered")
     return
 
 @bot.on_message(filters.command(["profile", "myprofile"], pre))
@@ -186,8 +186,11 @@ async def u_info(c: bot, m: Message):
                 try:
                     user = (await bot.get_users(split[1])).id
                 except Exception:
-                    await m.reply_text("Unable to find user.")
-                    return
+                    try:
+                        user = (await bot.get_users(split[1].split("/")[-1])).id
+                    except:
+                        await m.reply_text("Unable to find user.")
+                        return
     elif m.reply_to_message:
         user = m.reply_to_message.from_user.id
     User = USERS(user).get_info()
@@ -243,12 +246,32 @@ async def file_adder(c: bot, m: Message):
     f_name = str(ff_name.text.lower())
     await bot.send_message(m.from_user.id, "File name received")
     ff_link = await bot.ask(
-        text = "Send me the link of the file",
-        chat_id = m.from_user.id,
-        filters=filters.text
+        text = "Send me the file",
+        chat_id = m.from_user.id
         )
-    await bot.send_message(m.from_user.id, "File link received")
-    f_link = str(ff_link.text)
+    x = await bot.send_message(m.from_user.id, "File received")
+    m_id = int(x.id) - 1
+    x = await x.edit_text("Trying to get file id...")
+    file = await bot.get_messages(m.chat.id, m_id)
+    if file.document:
+        file_id = file.document.file_id
+        file_type = "document"
+    elif file.photo:
+        file_id = file.photo.file_id
+        file_type = "photo"
+    elif file.video:
+        file_id = file.video.file_id
+        file_type = "video"
+    elif file.animation:
+        file_id = file.animation.file_id
+        file_type = "animation"
+    elif file.video_note:
+        file_id = file.video_note.file_id
+        file_type = "video_note"
+    else:
+        x = await x.edit_text("Unsupported file type provided")
+        return
+    x = await x.edit_text("File id received")
     while True:
         ff_coin = await bot.ask(
             text = "Send me the amount of the file you want to set",
@@ -288,7 +311,7 @@ async def file_adder(c: bot, m: Message):
     
     edit = await bot.send_message(m.from_user.id, "All value recieved initalizing database")
 
-    is_their = Stuff.add_file(f_name, f_link, f_coin, f_type)
+    is_their = Stuff.add_file(f_name, file_id, f_coin, f_type, file_type)
     if is_their:
         await bot.edit_message_text(m.from_user.id, edit.id, "Added the file and it's info to database")
         return
@@ -301,15 +324,15 @@ async def rm_file(c: bot, m: Message):
     Stuff = STUFF
     split = m.text.split(None,1)
     if len(split) == 1:
-        await m.reply_text("USAGE : `/rmfile` <link of the file>")
+        await m.reply_text("USAGE : `/rmfile` <id of the file>")
         return
-    link = split[1]
+    link = int(split[1])
     rm = Stuff.remove_file(link)
     if rm:
         await m.reply_text("Removed file")
         return
     else:
-        await m.reply_text("Unable to find file with corresponding link.")
+        await m.reply_text("Unable to find file with corresponding id.")
         return
 
 
