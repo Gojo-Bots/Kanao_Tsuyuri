@@ -14,10 +14,15 @@ BOT_TOKEN = getenv("BOT_TOKEN", None)
 DB_URI = getenv("DB_URI")
 DB_NAME = getenv("DB_NAME")
 OWNER = {int(i) for i in getenv("OWNER_ID")}
-SUDO = list({int(i) for i in getenv("SUDO")})
+sudo = getenv("SUDO")
+if sudo:
+    SUDO = list({int(i) for i in sudo})
+else:
+    SUDO = []
 OWNER_ID = []
 OWNER_ID.append(OWNER)
-OWNER_ID.extend(SUDO)
+if SUDO:                 
+    OWNER_ID.extend(SUDO)
 C = getenv("CATEGORY").split(None) # Don't remove this line
 x = []
 for i in C:
