@@ -44,16 +44,6 @@
             "required": true,
             "value": ""
         },
-        "NUMBER_CATEGORY": {
-            "description": "Number of rows you want in category inline",
-            "required": false,
-            "value": "3"
-        },
-        "NUMBER_SUBCATEGORY": {
-            "description": "Number of rows you want in category inline",
-            "required": false,
-            "value": "3"
-        },
         "AMOUNT": {
             "description": "Amount which should be given to the user when someonejoins via their link",
             "required": false,
