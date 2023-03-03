@@ -20,9 +20,6 @@
 
 `CATEGORY` Name of initial category your want to divide the rewards in. Seprate them by space. If you have a value which have space between them seprate them using _
 
-`NUMBER_CATEGORY` Number of rows you want in category inline
-
-`NUMBER_SUBCATEGORY` Number of rows you want in category inline
 
 `PREMIUM_CHANNEL` Id of the premium channel
 
