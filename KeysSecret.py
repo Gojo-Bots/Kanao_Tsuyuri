@@ -13,23 +13,16 @@ API_HASH = getenv("API_HASH", None)
 BOT_TOKEN = getenv("BOT_TOKEN", None)
 DB_URI = getenv("DB_URI")
 DB_NAME = getenv("DB_NAME")
-OWNER = {int(i) for i in getenv("OWNER_ID")}
-sudo = getenv("SUDO")
-if sudo:
-    SUDO = list({int(i) for i in sudo})
-else:
-    SUDO = []
+OWNER = int(getenv("OWNER_ID"))
+SUDO = list({int(i) for i in getenv("SUDO")})
 OWNER_ID = []
-OWNER_ID.append(OWNER)
-if SUDO:                 
-    OWNER_ID.extend(SUDO)
+OWNER_ID.append(OWNER)               
+OWNER_ID.extend(SUDO)
 C = getenv("CATEGORY").split(None) # Don't remove this line
 x = []
 for i in C:
     x.append(i.strip().lower())
 CATEGORY = x
-No_cat = int(getenv("NUMBER_CATEGORY", 3))
-No_sub_cat = int(getenv("NUMBER_SUBCATEGORY", 3))
 AMOUNT = int(getenv("AMOUNT", 5))
 CHAT_ID = getenv("CHAT_ID", None)
 PREMIUM_CHANNEL = getenv("PREMIUM_CHANNEL")

@@ -12,7 +12,7 @@
 
 `OWNER_ID` Your telegram user id.
 
-`SUDO` Sudoers id. Have same powers as owner. Seprate multiple value with space
+`SUDO` Sudoers id. Have same powers as owner. Seprate multiple value with space. Don't leave it blank enter your id if you don't find any sudo
 
 `DB_NAME` Your [MongoDB](https://www.mongodb.com/) name
 

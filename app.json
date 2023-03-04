@@ -25,8 +25,8 @@
             "value" : ""
         },
         "SUDO": {
-            "description": "Sudoers id. Have same powers as owner. Seprate multiple value with space",
-            "required" : false,
+            "description": "Sudoers id. Have same powers as owner. Seprate multiple value with space. Don't leave it blank enter your id if you don't find any sudo",
+            "required" : true,
             "value" : ""
         },
         "DB_URI": {

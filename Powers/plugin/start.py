@@ -45,7 +45,8 @@ and the user joined by that link will not considered as any base to give reward 
 /addowner <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
 /rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)`
 
-**NOTE**: Your info will be stored in database when you type /link in the group
+**NOTE:** 
+Your info will be stored in database when you type /link in the group
 
 **db** standas for **DataBase**
 """
@@ -123,6 +124,7 @@ async def link_(c: bot, m: Message):
             c_link = (await bot.create_chat_invite_link(int(CHAT_ID))).invite_link
         except Exception as e:
             await m.reply_text(f"Failed to create chat invite link due to following error:\n{e}")
+            return
         User = USERS(m.from_user.id)
         User.save_user(c_link)
         await m.reply_text(f"Here is your invite link:\n`{c_link}`")
