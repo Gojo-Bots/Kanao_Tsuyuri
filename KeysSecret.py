@@ -24,6 +24,6 @@ for i in C:
     x.append(i.strip().lower())
 CATEGORY = x
 AMOUNT = int(getenv("AMOUNT", 5))
-CHAT_ID = getenv("CHAT_ID", None)
-PREMIUM_CHANNEL = getenv("PREMIUM_CHANNEL")
+CHAT_ID = int(getenv("CHAT_ID"))
+PREMIUM_CHANNEL = int(getenv("PREMIUM_CHANNEL"))
 PREMIUM_COST = int(getenv("PREMIUM_COST", 50))
