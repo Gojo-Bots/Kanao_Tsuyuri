@@ -159,7 +159,7 @@ async def premium_channel(c: bot, m: Message):
             ]]
         )
         await m.reply_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
-        u_link = str(user["link"])
+        u_link = str(Users["link"])
         USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
         return
     else:
@@ -187,7 +187,7 @@ async def premium_link(c: bot, q: CallbackQuery):
             ]]
         )
         await q.edit_message_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
-        u_link = str(user["link"])
+        u_link = str(Users["link"])
         USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
         return
     else:
