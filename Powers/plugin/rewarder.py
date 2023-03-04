@@ -133,6 +133,7 @@ async def initial_call(c: bot, q: CallbackQuery):
                     await q.message.reply_animation(s_file, caption="Here is your delivery")
                     USERS.update_coin(u_link, deduct=True)
                 await q.answer("Successfully pruchased")
+                USERS.update_coin(str(u_link), int(s_coin), True)
                 return
             except Exception as e:
                 await q.message.reply_text("Failed to buy")
@@ -158,6 +159,8 @@ async def premium_channel(c: bot, m: Message):
             ]]
         )
         await m.reply_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
+        u_link = str(user["link"])
+        USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
         return
     else:
         await m.reply_text(
@@ -184,6 +187,8 @@ async def premium_link(c: bot, q: CallbackQuery):
             ]]
         )
         await q.edit_message_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
+        u_link = str(user["link"])
+        USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
         return
     else:
         back_btn = IKM(
