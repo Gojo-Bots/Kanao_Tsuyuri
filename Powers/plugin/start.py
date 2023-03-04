@@ -218,17 +218,17 @@ async def cat_adder(c:bot, m:Message):
         await m.reply_text("You can't do that")
         return
     if len(m.text.split(None)) == 2:
-        CATEGORY.append(str(m.text.split(None)[1].capitalize))
-        added = str(m.text.split(None)[1].capitalize)
+        CATEGORY.append(str(m.text.split(None)[1].capitalize()))
+        added = str(m.text.split(None)[1].capitalize())
         await m.reply_text(f"Added {added} to CATEGORY")
         return
     else:
         x = await bot.ask(text = "Send me the name of CATEGORY",
         chat_id = m.from_user.id,
         filters=filters.text)
-        CATEGORY.append(str(x.text.capitalize))
+        CATEGORY.append(str(x.text.capitalize()))
 
-        await m.reply_text(f"Added {x.text.capitalize} to CATEGORY")
+        await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
         return
 
 
