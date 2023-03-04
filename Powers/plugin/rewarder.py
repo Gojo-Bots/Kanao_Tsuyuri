@@ -146,6 +146,9 @@ async def initial_call(c: bot, q: CallbackQuery):
 async def premium_channel(c: bot, m: Message):
     u_id = m.from_user.id
     Users = USERS(u_id).get_info()
+    if not Users:
+        await m.reply_text("Type /link to get registered in my db first")
+        return
     u_coin = int(Users["coin"])
     if u_coin >= PREMIUM_COST:
         c_link = (await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)).invite_link
@@ -165,6 +168,9 @@ async def premium_channel(c: bot, m: Message):
 async def premium_link(c: bot, q: CallbackQuery):
     u_id = q.from_user.id
     Users = USERS(u_id).get_info()
+    if not Users:
+        await m.reply_text("Type /link to get registered in my db first")
+        return
     u_coin = int(Users["coin"])
     if u_coin >= PREMIUM_COST:
         c_link = (await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)).invite_link
