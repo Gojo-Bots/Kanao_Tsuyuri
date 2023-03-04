@@ -1,5 +1,7 @@
 from pyrogram.types import CallbackQuery, InlineKeyboardButton
 from pyrogram.enums import ChatType as CT
+"""from pyrogram.raw.functions.account import SetPrivacy
+from pyrogram.raw.types import InputPrivacyValueDisallowContacts as IPVDC"""
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
 from Powers import *
@@ -91,17 +93,32 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.message.reply_text(f"Failed to change the menu due to\n{e}")
 
             return
-    if call == "purchase":
+@bot.on_callback_query(filters.regex("^want_"),group=4)
+async def initial_call(c: bot, q: CallbackQuery):
+    if q.message.chat.type != CT.PRIVATE:
+        return
+    Stuff = STUFF()
+    data = q.data.split("_",1)[-1]
+    name = str(data).replace("_", " ")
+    if True:
         User = USERS(q.from_user.id)
         user = User.get_info()
+        if not user:
+            await q.edit_message_text("You don't have any link genrated. Type /link first")
+            return
         u_link = str(user["link"])
         u_coin = int(user["coin"])
-        caption = q.message.text.split(":")
-        name = caption[1].strip().split("\n")[0]
         s_coin = int(Stuff.get_amount(name))
         s_file = str(Stuff.get_file_link(name)[0])
         s_type = str(Stuff.get_file_link(name)[1])
         if u_coin >= s_coin:
+            """privacy_settings = IPVDC()
+            await bot.invoke(
+                SetPrivacy(
+                    key = privacy_settings,
+                    rules =[]
+                )
+            )"""
             await q.edit_message_reply_markup(IKM(purchased))
             try:
                 if s_type == "document":
@@ -191,6 +208,6 @@ Name : {f_name}
 CATEGORY : {f_category}
 Amount : {amount}
     """
-    key = purchase_kb()
+    key = purchase_kb(data)
     await q.edit_message_text(txt, reply_markup=key)
     return

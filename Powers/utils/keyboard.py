@@ -1,5 +1,3 @@
-from pykeyboard import InlineButton as ib
-from pykeyboard import InlineKeyboard as ikb
 from pyrogram.types import InlineKeyboardButton as KB, InlineKeyboardMarkup as IKM
 
 from KeysSecret import *
@@ -82,16 +80,13 @@ def stuff_kb(needed: str):
             ]
         return False, IKM(media_kb)
 
-def purchase_kb():
-    purchase = ikb()
-    purchase.row(
-        ib("Purchase", "purchase")
-    )
-    purchase.row(
-        ib("Close", "close"),
-        ib("Back", "bback") #This back will genrate the buy menu again
-    )
-    return purchase
+def purchase_kb(name):
+    purchase = [
+        [KB("Purchase", f"want_{name}")],
+        [KB("Close", "close"),
+        KB("Back", "bback")] #This back will genrate the buy menu again
+        ]
+    return IKM(purchase)
 
 purchased = [
     [

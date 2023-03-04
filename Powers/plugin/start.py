@@ -10,7 +10,7 @@ from Powers.utils.keyboard import *
 
 @bot.on_message(filters.command(["start"], pre))
 async def start_(c: bot, m: Message):
-    txt = f"Hi! {m.from_user.mention}\nDo `/help` to know what I can do."
+    txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
 
     if m.chat.type == CT.PRIVATE:
         await bot.send_message(m.chat.id, txt)
@@ -43,10 +43,9 @@ and the user joined by that link will not considered as any base to give reward 
 /rmfile <id of the file>: To remove file
 /addcat <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
 /addowner <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
-/rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)`
+/rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)
 
-**NOTE:** 
-Your info will be stored in database when you type /link in the group
+**NOTE**: Your info will be stored in database when you type /link in the group
 
 **db** standas for **DataBase**
 """

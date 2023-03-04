@@ -49,6 +49,7 @@ class STUFF(MongoDB):
             return False
 
     def get_amount(self, name: str):
+        name = name.lower()
         curr = self.find_one({"name" : name})
         if curr:
             amount = curr["ncoin"]
