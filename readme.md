@@ -25,6 +25,14 @@
 
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
+[![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/Member_adder/tree/main)
+
+# Credits 💫
+[Dan](https://github.com/delivrance) `for pyrogram`
+
+[ChimkuOp](https://github.com/ChimkuOp) `for idea`
+
+[Me](https://github.com/iamgojoof6eyes) `for nothing`
 
 
 # Powered by [ɢօʝօ ɮօȶֆ](https://github.com/Gojo-Bots)
