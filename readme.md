@@ -20,6 +20,7 @@
 
 `CATEGORY` Name of initial category your want to divide the rewards in. Seprate them by space. If you have a value which have space between them seprate them using _
 
+`CHAT_ID` Id of the chat in which u have to add members
 
 `PREMIUM_CHANNEL` Id of the premium channel
 
