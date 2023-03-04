@@ -89,7 +89,7 @@ class USERS(MongoDB):
         if not deduct:
             coin = int(coin) + int(amount)
         elif deduct:
-            coin = int(coin) - int(deduct) 
+            coin = int(coin) - int(amount) 
         with INSERTION_LOCK:
             collection = MongoDB(USERS.db_name)
             collection.update(
