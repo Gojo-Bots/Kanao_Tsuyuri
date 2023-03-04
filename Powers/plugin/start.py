@@ -133,7 +133,7 @@ async def link_(c: bot, m: Message):
     elif is_user:
         User = USERS(m.from_user.id)
         await m.reply_text(
-            f"You already have an invite link\n[Here is your link]({User.get_link()})",
+            f"You already have an invite link\nHere is your link : `{User.get_link()}`",
             reply_markup=IKM(yes_no),
             disable_web_page_preview=True
         )
