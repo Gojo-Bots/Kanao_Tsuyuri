@@ -7,6 +7,7 @@ from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
 
+info_dict = {}
 
 @bot.on_message(filters.command(["start"], pre))
 async def start_(c: bot, m: Message):
@@ -153,6 +154,11 @@ async def new_linkkk(c: bot, q: CallbackQuery):
     if data == "yus":
         try:
             c_link = (await bot.create_chat_invite_link(CHAT_ID)).invite_link
+            try:
+                old_link = User.get_link()
+                del info_dict[f"{old_link}"]
+            except KeyError:
+                pass
         except Exception as e:
             await q.message.reply_text("Failed to create chat invite link")
         User.update_link(c_link)
@@ -336,7 +342,6 @@ async def rm_file(c: bot, m: Message):
         await m.reply_text("Unable to find file with corresponding id.")
         return
 '''
-info_dict = {}
 @bot.on_chat_member_updated(filters.chat(CHAT_ID))
 async def coin_increaser(c: bot, u: ChatMemberUpdated):
     if u.new_chat_member:
