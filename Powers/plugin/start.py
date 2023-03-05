@@ -40,7 +40,7 @@ and the user joined by that link will not considered as any base to give reward 
 
 **OWNER ONLY**
 /addfile : To add file
-/rmfile <id of the file>: To remove file
+/rmfile <id of the file>: To remove file (Currently not in use)
 /addcat <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
 /addowner <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
 /rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)
@@ -217,16 +217,16 @@ async def cat_adder(c:bot, m:Message):
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
-    if len(m.text.split(None)) == 2:
-        CATEGORY.append(str(m.text.split(None)[1].capitalize()))
-        added = str(m.text.split(None)[1].capitalize())
+    if len(m.text.split(None,1)) == 2:
+        CATEGORY.append(str(m.text.split(None,1)[1].replace(" ", "_").lower()))
+        added = str(m.text.split(None,1)[1].capitalize())
         await m.reply_text(f"Added {added} to CATEGORY")
         return
     else:
         x = await bot.ask(text = "Send me the name of CATEGORY",
         chat_id = m.from_user.id,
         filters=filters.text)
-        CATEGORY.append(str(x.text.capitalize()))
+        CATEGORY.append(str(x.text.replace(" ", "_").lower()))
 
         await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
         return
@@ -294,7 +294,7 @@ async def file_adder(c: bot, m: Message):
 
     txt = "Send me type of the file you want to set available types:\n"
     for i in sorted(list(set(CATEGORY))):
-        txt += f"\n{i}\n"
+        txt += f"\n`{i}`\n"
     txt += "\n If the file name contains space between them seprate them using **_**"
     while True:
         ff_type = await bot.ask(
@@ -319,13 +319,13 @@ async def file_adder(c: bot, m: Message):
     else:
         await bot.edit_message_text(m.from_user.id, edit.id, "File already exsist")
         return
-
+'''
 @bot.on_message(filters.command(["rmfile"], pre) & filters.private)
 async def rm_file(c: bot, m: Message):
     Stuff = STUFF
     split = m.text.split(None,1)
     if len(split) == 1:
-        await m.reply_text("USAGE : `/rmfile` <id of the file>")
+        await m.reply_text("USAGE : `/rmfile`")
         return
     link = int(split[1])
     rm = Stuff.remove_file(link)
@@ -335,8 +335,8 @@ async def rm_file(c: bot, m: Message):
     else:
         await m.reply_text("Unable to find file with corresponding id.")
         return
-
-
+'''
+info_dict = {}
 @bot.on_chat_member_updated(filters.chat(CHAT_ID))
 async def coin_increaser(c: bot, u: ChatMemberUpdated):
     if u.new_chat_member:
@@ -344,6 +344,13 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
             link = u.invite_link.invite_link
             if not link:
                 return
+            user_joined = u.new_chat_member.user.id
+            try:
+                if user_joined in info_dict[f"{link}"]:
+                    return
+                info_dict[f"{link}"].append(int(user_joined))
+            except KeyError:
+                info_dict[f"{link}"] = [user_joined]
             USERS.update_coin(str(link), int(AMOUNT))
             USERS.update_joined(str(link))
             return
