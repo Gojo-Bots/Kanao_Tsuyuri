@@ -9,6 +9,12 @@ from Powers.utils.keyboard import *
 
 info_dict = {}
 
+def is_cancel(msg):
+    if str(msg).lower() == "/cancel":
+        return True
+    else:
+        False
+
 @bot.on_message(filters.command(["start"], pre))
 async def start_(c: bot, m: Message):
     txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
@@ -232,6 +238,8 @@ async def cat_adder(c:bot, m:Message):
         x = await bot.ask(text = "Send me the name of CATEGORY",
         chat_id = m.from_user.id,
         filters=filters.text)
+        if is_cancel(x.text):
+            return
         CATEGORY.append(str(x.text.replace(" ", "_").lower()))
 
         await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
@@ -250,12 +258,16 @@ async def file_adder(c: bot, m: Message):
         chat_id = m.from_user.id,
         filters=filters.text
         )
+    if is_cancel(ff_name.text):
+        return    
     f_name = str(ff_name.text.lower())
     await bot.send_message(m.from_user.id, "File name received")
     ff_link = await bot.ask(
         text = "Send me the file",
         chat_id = m.from_user.id
         )
+    if is_cancel(ff_link.text):
+        return
     x = await bot.send_message(m.from_user.id, "File received")
     m_id = int(x.id) - 1
     x = await x.edit_text("Trying to get file id...")
@@ -285,6 +297,8 @@ async def file_adder(c: bot, m: Message):
             chat_id = m.from_user.id,
             filters=filters.text
             )
+        if is_cancel(ff_coin.text):
+            return
         f_coin = ff_coin
 
         try:
@@ -308,6 +322,8 @@ async def file_adder(c: bot, m: Message):
             chat_id = m.from_user.id,
             filters=filters.text
             )
+        if is_cancel(ff_type.text):
+            return
         f_type = str(ff_type.text.lower())
 
         if str(f_type).lower() not in CATEGORY:
