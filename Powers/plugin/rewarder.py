@@ -21,7 +21,7 @@ async def rewards(c: bot, m: Message):
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
-    call = str(q.data).split("_")[1]
+    call = str(q.data).split("_",1)[1]
     try:
         is_present, key = stuff_kb(call)
         if is_present:
