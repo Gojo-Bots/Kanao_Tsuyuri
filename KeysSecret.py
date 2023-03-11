@@ -22,6 +22,7 @@ C = getenv("CATEGORY").split(None) # Don't remove this line
 x = []
 for i in C:
     x.append(i.strip().lower())
+COIN_NAME = str(getenv("COIN_NAME"))
 CATEGORY = x
 AMOUNT = int(getenv("AMOUNT", 5))
 CHAT_ID = int(getenv("CHAT_ID"))

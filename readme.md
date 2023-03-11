@@ -24,6 +24,8 @@
 
 `PREMIUM_CHANNEL` Id of the premium channel
 
+`COIN_NAME` Your custom coin name with emoji
+
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
 [![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/Member_adder/tree/main)

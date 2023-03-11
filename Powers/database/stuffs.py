@@ -10,10 +10,10 @@ class STUFF(MongoDB):
     def __init__(self):
         super().__init__(self.db_name)
 
-    def add_file(self, name: str, f_id: int, ncoin: int, dtype: str, file_type: str):
+    def add_file(self, name: str, f_id: str, ncoin: int, dtype: str, file_type: str):
         with INSERTION_LOCK:
             name = name.lower()
-            curr = self.find_one({"name" : name})
+            curr = self.find_one({"f_id":f_id})
             if not curr:
                 self.insert_one(
                     {

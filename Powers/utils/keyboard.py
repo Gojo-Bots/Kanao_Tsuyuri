@@ -7,9 +7,21 @@ stuff = STUFF()
 
 
 yes_no = [[
-    KB("Yes", "new_yus"),
-    KB("No", "new_noi")
+    KB("✅ Yes", "new_yus"),
+    KB("🚫 No", "new_noi")
 ]]
+def help_kb(owner_username):
+    help_kb = [
+        [
+            KB("📚 Help", "help")
+        ],
+        [
+            KB("👑 Owner", url = f"https://{owner_username}.t.me/"),
+            KB("⚡️ Powered By", url = "https://gojo_bots_network.t.me")
+        ],
+
+    ]
+    return IKM(help_kb)
 
 def arranger_kb(values):
     cmds = sorted(list(values))
@@ -19,7 +31,7 @@ def arranger_kb(values):
 def initial_kb_gen(text, value, type="callback_data"):
     return KB(text, **{type: value})
 
-def initial_kb():
+def initial_kb(remove: bool = False):
     Category = CATEGORY
     for i in list(stuff.file_sorted()):
         Category.append(i)
@@ -31,22 +43,23 @@ def initial_kb():
             for j in i:
                 if j.split("_"):
                     line.append(
-                        initial_kb_gen(str(j).replace("_", " ").capitalize(), f"buy_{str(j).lower()}")
+                        initial_kb_gen(str(j).replace("_", " ").capitalize(), f"{'buy' if not remove else 'rmbuy'}_{str(j).lower()}")
                         )
                 elif not j.split("_"):
-                    line.append(initial_kb_gen(str(j).capitalize(), f"buy_{str(j).lower()}"))
-            key.append(line)     
-    key.extend([
-        [
-            KB("Premium Channel", "premium_link")
-        ],
-        [
-            KB("Close", "close")
-        ]
-        ])
+                    line.append(initial_kb_gen(str(j).capitalize(), f"{'buy' if not remove else 'rmbuy'}_{str(j).lower()}"))
+            key.append(line)
+    if not remove:
+        key.extend([
+            [
+                KB("❤️‍🔥 Premium Channel", "premium_link")
+            ],
+            [
+                KB("❌ Close", "close")
+            ]
+            ])
     return IKM(key)
 
-def stuff_kb(needed: str):
+def stuff_kb(needed: str, remove: bool = False):
     req = needed.lower()
     files = STUFF().get_files(req)
     if files:
@@ -57,40 +70,47 @@ def stuff_kb(needed: str):
             for j in i:
                 if j.split(None):
                     line.append(
-                        initial_kb_gen(str(j).capitalize(), f"call_{str(j).lower().replace(' ', '_')}")
+                        initial_kb_gen(str(j).capitalize(), f"{'call' if not remove else 'rmcall'}_{str(j).lower().replace(' ', '_')}")
                     )
                 elif not j.split(None):
                     line.append(
-                        initial_kb_gen(str(j).capitalize(), f"call_{str(j).lower()}")
+                        initial_kb_gen(str(j).capitalize(), f"{'call' if not remove else 'rmcall'}_{str(j).lower()}")
                     )
             media_kb.append(line)
         media_kb.extend(
             [[
-            KB("Back", "back"),
-            KB("Close", "close")
+            KB("⬅️ Back", f"{'back' if not remove else 'rmback'}"),
+            KB("❌ Close", "close")
             ]]
         )
         return True, IKM(media_kb)
     else:
         media_kb = [
             [
-                KB("Back", "back"), # This back will genrate initial menu
-                KB("Close", "close")
+                KB("⬅️ Back", f"{'back' if not remove else 'rmback'}"), # This back will genrate initial menu
+                KB("❌ Close", "close")
             ]
             ]
         return False, IKM(media_kb)
 
 def purchase_kb(name):
     purchase = [
-        [KB("Purchase", f"want_{name}")],
-        [KB("Close", "close"),
-        KB("Back", "bback")] #This back will genrate the buy menu again
+        [KB("💠 Purchase", f"want_{name}")],
+        [KB("❌ Close", "close"),
+        KB("⬅️ Back", "bback")] #This back will genrate the buy menu again
+        ]
+    return IKM(purchase)
+
+def remove_kb(name):
+    purchase = [
+        [KB("🗑 Remove", f"rmwant_{name}")],
+        [KB("⬅️ Back", "rmbback"),KB("❌ Close", "close")] #This back will genrate the buy menu again
         ]
     return IKM(purchase)
 
 purchased = [
     [
-        KB("Back", "bback"),
-        KB("Close", "close")
+        KB("⬅️ Back", "bback"),
+        KB("❌ Close", "close")
     ]
 ]

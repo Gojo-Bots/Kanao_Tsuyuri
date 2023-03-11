@@ -23,7 +23,7 @@ class USERS(MongoDB):
                 return False
         
 
-    def save_user(self, link: str, coin: int = 0, joined: int = 0):
+    def save_user(self, link: str, coin: int = 0, joined: int = 0, d_joined = 0):
         with INSERTION_LOCK:
             curr = self.find_one({"user_id": self.user_id})
             if not curr:
@@ -32,7 +32,8 @@ class USERS(MongoDB):
                         "user_id" : self.user_id,
                         "link" : link,
                         "coin" : coin,
-                        "joined" : joined
+                        "joined" : joined,
+                        "d_not_joined" : d_joined
                     }
                 )
             else:
@@ -57,6 +58,17 @@ class USERS(MongoDB):
                 return coins
             else:
                 return False
+    @staticmethod
+    def get_all_users():
+        with INSERTION_LOCK:
+            collection = MongoDB(USERS.db_name)
+            curr = collection.find_all()
+            if curr:
+                users= [i["user_id"] for i in curr]
+                return users
+            else:
+                return False
+                
     @staticmethod
     def get_joined_by_link(link: str):
         with INSERTION_LOCK:

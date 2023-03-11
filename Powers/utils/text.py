@@ -17,11 +17,20 @@ and the user joined by that link will not considered as any base to give reward 
 
 **OWNER ONLY**
 /addfile : To add file
+
 /rmfile
+
 /addcat <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
+
 /addowner <reply to user or his id> : Add user to owner list (Only be in list until the bot restarts)
+
 /rmowner <reply to user or his id> : Remove user to owner list (Only be in list until the bot restarts)
+
 /broadcast : Just type broadcast in reply to message to broadcast the message
+
+/gift <user_id> <amount> : Give coin to user if you are replying to user don't pass user_id else the coin will be given to passed user not the tagged one.
+
+/giftall <amount> : Give coin to all current users
 
 **NOTE**: Your info will be stored in database when you type /link in the group
 
