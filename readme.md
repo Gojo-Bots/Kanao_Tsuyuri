@@ -1,5 +1,5 @@
 # About:
-* As name given `domain_expansion` (from jjk in which caster creates a domain around the peoples) caster(the deployer of the bot) will be able to expand your domain(group) by adding member in them (will be added by user who fetch the link) and the user will get coins for per join via their link
+* Like Kanao Tsuyuri from demon slayer this bot have coin but not one many which will be given to the users.
 
 
 
@@ -28,7 +28,7 @@
 
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
-[![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/domain_expansion/tree/main)
+[![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/Kanao_Tsuyuri/tree/main)
 
 # Credits 💫
 [Dan](https://github.com/delivrance) `for pyrogram`
