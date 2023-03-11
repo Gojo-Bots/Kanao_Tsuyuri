@@ -1,7 +1,7 @@
 {
     "name": "Member Adder",
     "description": "A telegram bot to find the files on the channel or group",
-    "repository": "https://github.com/Gojo-Bots/domain_expansion",
+    "repository": "https://github.com/Gojo-Bots/Kanao_Tsuyuri",
     
     "env": {
         "BOT_TOKEN": {
