@@ -1,5 +1,5 @@
 # About:
-* This bot will give the coin to the user when someone joins the gc with their fetched link.
+* As name given `domain_expansion` (from jjk in which caster creates a domain around the peoples) caster(the deployer of the bot) will be able to expand your domain(group) by adding member in them (will be added by user who fetch the link) and the user will get coins for per join via their link
 
 
 
@@ -28,7 +28,7 @@
 
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
-[![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/Member_adder/tree/main)
+[![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/domain_expansion/tree/main)
 
 # Credits 💫
 [Dan](https://github.com/delivrance) `for pyrogram`
