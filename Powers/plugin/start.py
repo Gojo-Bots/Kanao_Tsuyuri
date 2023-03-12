@@ -1,280 +1,478 @@
-from pyrogram.types import CallbackQuery, InlineKeyboardButton
 from pyrogram.enums import ChatType as CT
-"""from pyrogram.raw.functions.account import SetPrivacy
-from pyrogram.raw.types import InputPrivacyValueDisallowContacts as IPVDC"""
+from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
+from KeysSecret import *
 from Powers import *
 from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
+from Powers.utils.text import help_txt
 
+info_dict = {}
 
-
-@bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
-async def rewards(c: bot, m: Message):
-    txt = "What you want to buy"
-    await m.reply_text(txt, reply_markup=initial_kb())
-    return
-
-@bot.on_message(filters.command(["rmfile", "removefile"], pre))
-async def rem_file(c:bot , m: Message):
-    if m.from_user.id not in OWNER_ID:
-        await m.reply_text("Owner and sudoer command!")
-        return
-    txt = "What you want to remove"
-    await m.reply_text(txt, reply_markup=initial_kb(remove=True))
-    return   
-
-@bot.on_callback_query(filters.regex("^buy_") | filters.regex("^rmbuy"), 0)
-async def initial_call(c: bot, q: CallbackQuery):
-    if q.message.chat.type != CT.PRIVATE:
-        return
-    call = str(q.data).split("_",1)[1]
-    rem = False
-    if str(q.data).split("_",1)[0] == "rmbuy":
-        rem = True
-    try:
-        is_present, key = stuff_kb(call, remove=rem)
-        if is_present:
-            await q.edit_message_text(
-                f"What you want to {'buy' if not rem else 'remove'} in {call.capitalize()} section", 
-                reply_markup=key)
-            await q.answer("Buy menu")   
-            return
-        else:
-            await q.edit_message_text(
-                f"Nothing to {'buy' if not rem else 'remove'} here.", 
-                reply_markup=key)
-            await q.answer("Buy menu")
-            return
-    except Exception as e:
-        await q.message.reply_text(f"Failed to make keyboard. Or edit Message due to\n{e}")
-        print(e)
-        return
-
-
-@bot.on_callback_query(group=1)
-async def initial_call(c: bot, q: CallbackQuery):
-    if q.message.chat.type != CT.PRIVATE:
-        return
-    Stuff = STUFF()
-    call = str(q.data)
-    if call == "close":
-        try:
-            await q.answer("Closing")
-            await q.message.delete()
-            return
-        except Exception as e:
-            await q.message.reply_text("Failed to close menu")
-            print(e)
-            return
-    if call == "back":
-        try:
-            await q.edit_message_text(
-                "What you want to buy",
-                reply_markup=initial_kb()
-            )
-            await q.answer("Initial menu")
-            return
-        except Exception as e:
-            await q.edit_message_text(f"Failed to change the menu due to\n{e}")
-            print(e)
-            return
-    if call == "rmback":
-        try:
-            await q.edit_message_text(
-                "What you want to remove",
-                reply_markup=initial_kb(remove=True)
-            )
-            await q.answer("Initial menu")
-            return
-        except Exception as e:
-            await q.edit_message_text(f"Failed to change the menu due to\n{e}")
-            print(e)
-            return
-    if call == "rmbback":
-        try:
-            caption = q.message.text.split(None)
-            for i in caption:
-                if i.lower() in CATEGORY:
-                    need = i.lower()
-            is_present, key = stuff_kb(need, remove=True)
-            if is_present:
-                await q.edit_message_text(
-                    f"What you want to remove in {need} section",
-                    reply_markup=key
-                )
-                await q.answer("Buy menu")
-                return
-            elif not is_present:
-                await q.edit_message_text(
-                f"Nothing to buy here.", 
-                reply_markup=key)
-            await q.answer("Buy menu")
-            return
-        except Exception as e:
-            await q.message.reply_text(f"Failed to change the menu due to\n{e}")
-
-            return
-    if call == "bback":
-        try:
-            caption = q.message.text.split(None)
-            for i in caption:
-                if i.lower() in CATEGORY:
-                    need = i.lower()
-            is_present, key = stuff_kb(need)
-            if is_present:
-                await q.edit_message_text(
-                    f"What you want to buy in {need} section",
-                    reply_markup=key
-                )
-                await q.answer("Buy menu")
-                return
-            elif not is_present:
-                await q.edit_message_text(
-                f"Nothing to buy here.", 
-                reply_markup=key)
-            await q.answer("Buy menu")
-            return
-        except Exception as e:
-            await q.message.reply_text(f"Failed to change the menu due to\n{e}")
-
-            return
-@bot.on_callback_query(filters.regex("^want_") | filters.regex("^rmwant_"),group=4)
-async def initial_call(c: bot, q: CallbackQuery):
-    if q.message.chat.type != CT.PRIVATE:
-        return
-    Stuff = STUFF()
-    data = q.data.split("_",1)[-1]
-    name = str(data).replace("_", " ")
-    if q.data.split("_",1)[0] == "rmwant":
-        s_file = str(Stuff.get_file_link(name)[0])
-        Stuff.remove_file(s_file)
-        await q.edit_message_text("Removed the file")
-        await q.answer("Removed")
-        return
-    if True:
-        User = USERS(q.from_user.id)
-        user = User.get_info()
-        if not user:
-            await q.edit_message_text("You don't have any link genrated. Type /link first")
-            return
-        u_link = str(user["link"])
-        u_coin = int(user["coin"])
-        s_coin = int(Stuff.get_amount(name))
-        s_file = str(Stuff.get_file_link(name)[0])
-        s_type = str(Stuff.get_file_link(name)[1])
-        if u_coin >= s_coin:
-            """privacy_settings = IPVDC()
-            await bot.invoke(
-                SetPrivacy(
-                    key = privacy_settings,
-                    rules =[]
-                )
-            )"""
-            await q.edit_message_reply_markup(IKM(purchased))
-            try:
-                if s_type == "document":
-                    await q.message.reply_document(s_file, caption="Here is your delivery")
-                elif s_type == "video":
-                    await q.message.reply_video(s_file, caption="Here is your delivery")
-                elif s_type == "photo":
-                    await q.message.reply_photo(s_file, caption="Here is your delivery")
-                elif s_type == "video_note":
-                    await q.message.reply_video_note(s_file, caption="Here is your delivery")
-                elif s_type == "animation":
-                    await q.message.reply_animation(s_file, caption="Here is your delivery")
-                    USERS.update_coin(u_link, deduct=True)
-                await q.answer("Successfully pruchased")
-                USERS.update_coin(str(u_link), int(s_coin), True)
-                return
-            except Exception as e:
-                await q.message.reply_text("Failed to buy")
-                print(e)
-                return
-        else:
-            await q.answer("You don't have enough coin", True)
-            return
-
-@bot.on_message(filters.command(["premium"], pre) & filters.private) 
-async def premium_channel(c: bot, m: Message):
-    u_id = m.from_user.id
-    Users = USERS(u_id).get_info()
-    if not Users:
-        await m.reply_text("Type /link to get registered in my db first")
-        return
-    u_coin = int(Users["coin"])
-    if u_coin >= PREMIUM_COST:
-        c_link = (await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)).invite_link
-        join_chat = IKM(
-            [[
-                InlineKeyboardButton("✨ Click here to join", url=f"{c_link}")
-            ]]
-        )
-        await m.reply_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
-        u_link = str(Users["link"])
-        USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
-        return
+def is_cancel(msg):
+    if str(msg).lower() == "/cancel":
+        return True
     else:
-        await m.reply_text(
-            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}")
-        return
-
-@bot.on_callback_query(filters.regex("^premium_link$"), 3)
-async def premium_link(c: bot, q: CallbackQuery):
-    u_id = q.from_user.id
-    Users = USERS(u_id).get_info()
-    if not Users:
-        await q.message.reply_text("Type /link to get registered in my db first")
-        return
-    u_coin = int(Users["coin"])
-    if u_coin >= PREMIUM_COST:
-        c_link = (await bot.create_chat_invite_link(int(PREMIUM_CHANNEL), member_limit=1)).invite_link
-        join_chat = IKM(
-            [[
-                InlineKeyboardButton("✨ Click here to join", url=f"{c_link}")
-            ],
+        False
+back_kb = IKM(
+        [
             [
-                InlineKeyboardButton("⬅️ Back", "back"),
-                InlineKeyboardButton("❌ Close", "close")
-            ]]
-        )
-        await q.edit_message_text(f"Here is the invite link for the premium channel:\n[Click Here]({c_link})", reply_markup=join_chat, disable_web_page_preview=True)
-        u_link = str(Users["link"])
-        USERS.update_coin(str(u_link), int(PREMIUM_COST), True)
-        return
-    else:
-        back_btn = IKM(
-            [
-                [
-                    InlineKeyboardButton("⬅️ Back", "back"),
-                    InlineKeyboardButton("❌ Close", "close")
-                ]
+                KB("⬅️ Back", "menu_back"),
+                KB("❌ Close", "close")
             ]
-        )
-        await q.edit_message_text(
-            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}", reply_markup=back_btn)
+        ]
+    )
+@bot.on_message(filters.command(["start"], pre))
+async def start_(c: bot, m: Message):
+    owner_user = (await bot.get_users(OWNER)).username
+    txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
+    if m.chat.type == CT.PRIVATE:
+        await bot.send_message(m.chat.id, txt, reply_markup=help_kb(owner_user))
+        return
+    else:
+        await m.reply_text(txt,reply_markup=help_kb(owner_user))
+        return
+@bot.on_callback_query(filters.regex("^menu_"), group=-1)
+async def help_menu_back(c: bot, q: CallbackQuery):
+    data = q.data.split("_")[-1]
+    owner_user = (await bot.get_users(OWNER)).username
+    if data == "help":
+        await q.answer("Help menu")
+        await q.edit_message_text(help_txt, reply_markup=back_kb)
+        return
+    elif data == "back":
+        await q.answer("Back")
+        await q.edit_message_text(f"Hi! {q.message.from_user.mention}\nDo /help to know what I can do.", reply_markup=help_kb(owner_user))
         return
 
-@bot.on_callback_query(filters.regex("^call_") | filters.regex("^rmcall_"), 2)
-async def buy_menu(c: bot, q: CallbackQuery):
-    if q.message.chat.type != CT.PRIVATE:
+@bot.on_message(filters.command(["help"], pre))
+async def help_(c: bot, m: Message):
+    await m.reply_text(help_txt, reply_markup=back_kb)
+    return
+@bot.on_message(filters.command(["addowner"], pre))
+async def owner_add(c: bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    if m.reply_to_message:
+        user = m.reply_to_message.from_user.id
+    else:
+        user = m.text.split(None)[1]
+        try:
+            user = int(user)
+        except ValueError:
+            await m.reply_text("Give me id which is an integer type data")
+            return
+    try:
+        await bot.send_message(user, "You are added as owner")
+    except Exception:
+        await m.reply_text("Tell him to start the bot first")
+        return
+    OWNER_ID.append(user)
+    await m.reply_text(f"Added user id `{user}` to owner's list")
+    return
+@bot.on_message(filters.command(["rmowner"], pre))
+async def owner_rm(c: bot, m: Message):
+    if m.from_user.id not in OWNER:
+        await m.reply_text("You can't do that")
+        return
+    if m.reply_to_message:
+        user = m.reply_to_message.from_user.id
+    else:
+        user = m.text.split(None)[1]
+        try:
+            user = int(user)
+        except ValueError:
+            await m.reply_text("Give me id which is an integer type data")
+            return
+    for i in OWNER_ID:
+        if user == i:
+            OWNER_ID.remove(i)
+    await m.reply_text("Removed the user")
+
+@bot.on_message(filters.command(["owners"], pre))
+async def owners_info(c: bot, m: Message):
+    try:
+        infos = await bot.get_users(OWNER_ID)
+    except Exception as e:
+        await m.reply_text(f"Failed to get info of owners due to\n{e}")
+        return
+    txt = "**Here are the info of owners:**\n"
+    
+    for x in infos:
+        if not x.is_deleted:
+            txt += f"\nFull name : {x.first_name} {x.last_name}\nId : `{x.id}`\nUsername : @{x.username}\n\n"
+        else:
+            txt += f"\nThis user having id `{x.id} have deleted his account"
+
+    await m.reply_text(txt)
+    return
+
+@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot & (filters.chat(CHAT_ID) | filters.private))
+async def link_(c: bot, m: Message):
+    is_user = USERS.is_user(m.from_user.id)
+    if not is_user:
+        try:
+            to_del = await bot.send_message(m.from_user.id, "Genrating your link...")
+        except Exception:
+            await m.reply_text("Start the bot first")
+            return
+        try:
+            c_link = (await bot.create_chat_invite_link(int(CHAT_ID))).invite_link
+        except Exception as e:
+            await m.reply_text(f"Failed to create chat invite link due to following error:\n{e}")
+            return
+        User = USERS(m.from_user.id)
+        User.save_user(c_link)
+        await m.reply_text(f"Here is your invite link:\n`{c_link}`")
+        await to_del.edit_text(f"Here is your invite link:\n`{c_link}`")
+        return
+
+    elif is_user:
+        User = USERS(m.from_user.id)
+        await m.reply_text(
+            f"You already have an invite link\nHere is your link : `{User.get_link()}`",
+            reply_markup=IKM(yes_no),
+            disable_web_page_preview=True
+        )
+        return
+
+@bot.on_callback_query(filters.regex("^new_"), 4)
+async def new_linkkk(c: bot, q: CallbackQuery):
+    data = q.data.split("_")[1]
+    User = USERS(q.from_user.id)
+    to_del = await bot.send_message(q.from_user.id, "Genrating your link...")
+    try:
+        if q.message.reply_to_message.from_user.id != q.from_user.id:
+            await q.answer("This is not for you baka")
+            return
+    except AttributeError: # This means the user asked for link in private chat
+        pass 
+    if data == "yus":
+        try:
+            c_link = (await bot.create_chat_invite_link(CHAT_ID)).invite_link
+            try:
+                old_link = User.get_link()
+                del info_dict[f"{old_link}"]
+            except KeyError:
+                pass
+        except Exception as e:
+            await q.message.reply_text("Failed to create chat invite link")
+        User.update_link(c_link)
+        await q.edit_message_text(f"Here is your new invite link:\n`{c_link}`\nYou will not get reward if any user join with your previous invite link")
+        await to_del.edit_text(f"Here is your new invite link:\n`{c_link}`\nYou will not get reward if any user join with your previous invite link")
+        return
+    elif data == "noi":
+        await q.edit_message_text("Ok I haven't created new link for you")
+        await to_del.edit_text("Ok I haven't created new link for you")
+        return
+
+@bot.on_message(filters.command(["mylink"], pre))
+async def u_link(c: bot, m: Message):
+    User = USERS(m.from_user.id)
+    link = User.get_link()
+    if link:
+        await m.reply_text(f"Here is your link:\n`{link}`")
+        return
+    await m.reply_text("Seems link you are not registered in my db\nType /link to get registered")
+    return
+
+@bot.on_message(filters.command(["profile", "myprofile"], pre))
+async def u_info(c: bot, m: Message):
+    if not m.reply_to_message:
+        split = m.text.split(None, 1)
+        if len(split) == 1:
+            user = m.from_user.id
+        else:
+            try:
+                user = int(split[1])
+            except ValueError:
+                try:
+                    user = (await bot.get_users(split[1])).id
+                except Exception:
+                    try:
+                        user = (await bot.get_users(split[1].split("/")[-1])).id
+                    except:
+                        await m.reply_text("Unable to find user.")
+                        return
+    elif m.reply_to_message:
+        user = m.reply_to_message.from_user.id
+    User = USERS(user).get_info()
+    if User:
+        u_id = User["user_id"]
+        link = User["link"]
+        coin = User["coin"]
+        joined = User["joined"]
+        txt = f"""
+Here is the info of the user:
+🆔 User Id = `{u_id}`
+🔗 Link created = {link}
+Available coin {COIN_NAME}= `{coin}`
+👥 User joined via user's link = `{joined}`
+        """
+        await m.reply_text(txt, disable_web_page_preview=True)
+        return
+    else:
+        await m.reply_text("No info available. Seems like you are not registed. Start the bot and type /link to get registed")
+
+@bot.on_message(filters.command(["addcat"], pre) & filters.private)
+async def cat_adder(c:bot, m:Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    if len(m.text.split(None,1)) == 2:
+        CATEGORY.append(str(m.text.split(None,1)[1].replace(" ", "_").lower()))
+        added = str(m.text.split(None,1)[1].capitalize())
+        await m.reply_text(f"Added {added} to CATEGORY")
+        return
+    else:
+        x = await bot.ask(text = "Send me the name of CATEGORY",
+        chat_id = m.from_user.id,
+        filters=filters.text)
+        if is_cancel(x.text):
+            await m.reply_text("Canceled the operation")
+            return
+        CATEGORY.append(str(x.text.replace(" ", "_").lower()))
+
+        await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
+        return
+
+@bot.on_message(filters.command(['broadcast'], pre))
+async def broadcaster(c:bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    if not m.reply_to_message:
+        await m.reply_text("Reply to a message to broadcast it")
+        return
+    users = USERS.get_all_users()
+    i = 0
+    um = await m.reply_text("Broadcasting the message")
+    for user in users:
+        try:
+            await bot.forward_messages(int(user), m.chat.id, m.reply_to_message_id)
+        except Exception:
+            i += 1
+            pass
+    
+    await um.delete()
+    await m.reply_text(f"Successfully broadcasted the message to {len(users) - i} out of {len(users)} users")
+    return
+
+@bot.on_message(filters.command(["gift"], pre))
+async def gift_one(c: bot, m: Message):
+    if m.from_user.id != OWNER:
+        await m.reply_text("Only owner can do it")
+        return
+    split = m.text.split(None)
+    if len(split) < 3 and not (len(split) == 2 and m.reply_to_message):
+        await m.reply_text("Use /help to see how to use this command")
+        return
+    if len(split) == 3:
+        try:
+            user = int(split[1])
+        except ValueError:
+            await m.reply_text("Must pass user id")
+            return
+        try:
+            money = abs(int(split[2]))
+        except ValueError:
+            await m.reply_text("Coin should be natural number")
+        User = USERS(user).get_info()
+        if not User:
+            await m.reply_text("User is not registered in my database")
+        link = User["link"]
+        try:
+            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            USERS.update_coin(str(link), money)
+            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME}")
+            return
+        except Exception:
+            await m.reply_text("Tell the user to start the bot first")
+            return
+    if len(split) == 2:
+        user = m.reply_to_message.from_user.id
+        money = split[1]
+        try:
+            money = abs(int(split[1]))
+        except ValueError:
+            await m.reply_text("Coin should be natural number")
+        User = USERS(user).get_info()
+        link = User["link"]
+        try:
+            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            USERS.update_coin(str(link), money)
+            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME}")
+            return
+        except Exception:
+            await m.reply_text("Tell the user to start the bot first")
+            return
+
+@bot.on_message(filters.command(["giftall"], pre))
+async def gift_all(c: bot, m: Message):
+    if m.from_user.id != OWNER:
+        await m.reply_text("Only owner can do it")
+        return
+    split = m.text.split(None)
+    if len(split) != 2:
+        await m.reply_text("Type /help to see how")
+        return
+    try:
+        money = abs(int(split[1]))
+    except ValueError:
+        await m.reply_text("Coin should be natural number")
+        return
+    users = USERS.get_all_users()
+    links = {}
+    for user in users:
+        User = USERS(user).get_info()
+        link = User["link"]
+        links[user] = str(link)
+    um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME}")
+    l = 0
+    try:
+        for i,j in links.items():
+            await bot.send_message(int(i), f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            USERS.update_coin(j,money)
+    except Exception:
+        l+=1
+        pass
+    await um.delete()
+    await m.reply_text(f"Successfully given {len(links) - l} out of {len(links)} users {money} {COIN_NAME}")
+    return
+
+@bot.on_message(filters.command(["addfile"], pre) & filters.private)
+async def file_adder(c: bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
         return
     Stuff = STUFF()
-    data = q.data.split("_",1)[-1]
-    name = str(data).replace("_", " ")
-    file = Stuff.get_file_info(name)
-    f_name = file["name"].lower().capitalize()
-    amount = file["ncoin"]
-    f_category = file["type"]
-    txt = f"""
-Name : {f_name}
-CATEGORY : {f_category}
-Amount : {amount}
-    """
-    key = purchase_kb(data)
-    if q.data.split("_",1)[0] == "rmcall":
-        key = remove_kb(data)
-    await q.edit_message_text(txt, reply_markup=key)
-    return
+    ff_name = await bot.ask(
+        text="Send me the name of the file\nType /cancel to abort the operation", 
+        chat_id = m.from_user.id,
+        filters=filters.text
+        )
+    if is_cancel(ff_name.text):
+        await m.reply_text("Canceled the operation")
+        return    
+    f_name = str(ff_name.text.lower())
+    await bot.send_message(m.from_user.id, "File name received")
+    ff_link = await bot.ask(
+        text = "Send me the file\nType /cancel to abort the operation",
+        chat_id = m.from_user.id
+        )
+    if is_cancel(ff_link.text):
+        await m.reply_text("Canceled the operation")
+        return
+    x = await bot.send_message(m.from_user.id, "File received")
+    m_id = int(x.id) - 1
+    x = await x.edit_text("Trying to get file id...")
+    file = await bot.get_messages(m.chat.id, m_id)
+    if file.document:
+        file_id = file.document.file_id
+        file_type = "document"
+    elif file.photo:
+        file_id = file.photo.file_id
+        file_type = "photo"
+    elif file.video:
+        file_id = file.video.file_id
+        file_type = "video"
+    elif file.animation:
+        file_id = file.animation.file_id
+        file_type = "animation"
+    elif file.video_note:
+        file_id = file.video_note.file_id
+        file_type = "video_note"
+    else:
+        x = await x.edit_text("Unsupported file type provided")
+        return
+    x = await x.edit_text("File id received")
+    while True:
+        ff_coin = await bot.ask(
+            text = "Send me the amount of the file you want to set\nType /cancel to abort the operation",
+            chat_id = m.from_user.id,
+            filters=filters.text
+            )
+        if is_cancel(ff_coin.text):
+            await m.reply_text("Canceled the operation")
+            return
+        f_coin = ff_coin
+
+        try:
+            f_coin = abs(int(f_coin.text))
+            if f_coin:
+                await bot.send_message(m.from_user.id, "File amount received")
+                
+                break
+            else:
+                await bot.send_message(m.from_user.id, "Amount should not be 0")
+        except ValueError:
+            await bot.send_message(m.from_user.id, "Amount should be natural number")
+
+    txt = "Send me type of the file you want to set available types:\n"
+    for i in sorted(list(set(CATEGORY))):
+        txt += f"\n`{i}`\n"
+    txt += "\n If the file name contains space between them seprate them using **_**\nType /cancel to abort the operation"
+    while True:
+        ff_type = await bot.ask(
+            text = txt,
+            chat_id = m.from_user.id,
+            filters=filters.text
+            )
+        if is_cancel(ff_type.text):
+            await m.reply_text("Canceled the operation")
+            return
+        f_type = str(ff_type.text.lower())
+
+        if str(f_type).lower() not in CATEGORY:
+            new = await bot.ask(text = "Invalid file type\nDo you want to create new category\n type `yes` to create one and `no` to don't\nType /cancel to abort the operation", chat_id = m.from_user.id, filters = filters.text)
+            if is_cancel(new.text.lower()):
+                await m.reply_text("Canceled the operation")
+                return
+            if new.text.lower() == "yes":
+                new_cat = await bot.ask(text = "Send me the name of CATEGORY\nType /cancel to abort the operation", chat_id = m.from_user.id, filters = filters.text)
+                if is_cancel(new.text.lower()):
+                    await m.reply_text("Canceled the operation")
+                    return
+                CATEGORY.append(str(new_cat.text).replace(" ", "_").lower())
+                f_type = str(new_cat.text).replace(" ", "_").lower()
+                await bot.send_message(m.from_user.id, "File type received")
+                break
+        elif str(f_type).lower() in CATEGORY:
+            await bot.send_message(m.from_user.id, "File type received")
+            break
+    
+    edit = await bot.send_message(m.from_user.id, "All value recieved initalizing database")
+
+    is_their = Stuff.add_file(f_name, file_id, f_coin, f_type, file_type)
+    if is_their:
+        await bot.edit_message_text(m.from_user.id, edit.id, "Added the file and it's info to database")
+        return
+    else:
+        await bot.edit_message_text(m.from_user.id, edit.id, "File already exsist")
+        return
+
+@bot.on_chat_member_updated(filters.chat(CHAT_ID))
+async def coin_increaser(c: bot, u: ChatMemberUpdated):
+    if u.new_chat_member:
+        try:
+            link = u.invite_link.invite_link
+            if not link:
+                return
+            user_joined = u.new_chat_member.user.id
+            if not len(info_dict):
+                info_dict[f"{link}"] = [user_joined]
+                return
+            try:
+                if user_joined in info_dict[f"{link}"]:
+                    return
+                info_dict[f"{link}"].append(int(user_joined))
+            except KeyError:
+                info_dict[f"{link}"] = [user_joined]
+            USERS.update_coin(str(link), int(AMOUNT))
+            USERS.update_joined(str(link))
+            return
+        except AttributeError:
+            return

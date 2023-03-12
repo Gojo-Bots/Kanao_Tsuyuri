@@ -1,5 +1,6 @@
-from pyrogram.types import CallbackQuery, InlineKeyboardButton
 from pyrogram.enums import ChatType as CT
+from pyrogram.types import CallbackQuery, InlineKeyboardButton
+
 """from pyrogram.raw.functions.account import SetPrivacy
 from pyrogram.raw.types import InputPrivacyValueDisallowContacts as IPVDC"""
 from pyrogram.types import InlineKeyboardMarkup as IKM
@@ -8,7 +9,6 @@ from Powers import *
 from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
-
 
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
@@ -146,10 +146,11 @@ async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
     Stuff = STUFF()
-    data = q.data.split("_",1)[-1]
-    name = str(data).replace("_", " ")
+    data = q.data.split("_",1)[-1].split("/")[0]
+    data2 = q.data.split("/",1)[-1]
+    required = Stuff.get_file_info(data2,data)
+    s_file = required["f_id"]
     if q.data.split("_",1)[0] == "rmwant":
-        s_file = str(Stuff.get_file_link(name)[0])
         Stuff.remove_file(s_file)
         await q.edit_message_text("Removed the file")
         await q.answer("Removed")
@@ -162,9 +163,8 @@ async def initial_call(c: bot, q: CallbackQuery):
             return
         u_link = str(user["link"])
         u_coin = int(user["coin"])
-        s_coin = int(Stuff.get_amount(name))
-        s_file = str(Stuff.get_file_link(name)[0])
-        s_type = str(Stuff.get_file_link(name)[1])
+        s_coin = int(required["ncoin"])
+        s_type = str(required["file_type"])
         if u_coin >= s_coin:
             """privacy_settings = IPVDC()
             await bot.invoke(
@@ -262,9 +262,12 @@ async def buy_menu(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
     Stuff = STUFF()
-    data = q.data.split("_",1)[-1]
+    split = q.data.split("_",1)
+    rsplit = q.data.split("/",1)
+    ftype = split[-1].split("/")[0]
+    data = rsplit[-1]
     name = str(data).replace("_", " ")
-    file = Stuff.get_file_info(name)
+    file = Stuff.get_file_info(data,ftype)
     f_name = file["name"].lower().capitalize()
     amount = file["ncoin"]
     f_category = file["type"]
@@ -273,8 +276,8 @@ Name : {f_name}
 CATEGORY : {f_category}
 Amount : {amount}
     """
-    key = purchase_kb(data)
-    if q.data.split("_",1)[0] == "rmcall":
-        key = remove_kb(data)
+    key = purchase_kb(q.data.split("_",1)[-1])
+    if split[0] == "rmcall":
+        key = remove_kb()
     await q.edit_message_text(txt, reply_markup=key)
     return

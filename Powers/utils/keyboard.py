@@ -1,4 +1,5 @@
-from pyrogram.types import InlineKeyboardButton as KB, InlineKeyboardMarkup as IKM
+from pyrogram.types import InlineKeyboardButton as KB
+from pyrogram.types import InlineKeyboardMarkup as IKM
 
 from KeysSecret import *
 from Powers.database.stuffs import STUFF
@@ -13,7 +14,7 @@ yes_no = [[
 def help_kb(owner_username):
     help_kb = [
         [
-            KB("📚 Help", "help")
+            KB("📚 Help", "menu_help")
         ],
         [
             KB("👑 Owner", url = f"https://{owner_username}.t.me/"),
@@ -70,7 +71,7 @@ def stuff_kb(needed: str, remove: bool = False):
             for j in i:
                 if j.split(None):
                     line.append(
-                        initial_kb_gen(str(j).capitalize(), f"{'call' if not remove else 'rmcall'}_{str(j).lower().replace(' ', '_')}")
+                        initial_kb_gen(str(j).capitalize(), f"{'call' if not remove else 'rmcall'}_{req}/{str(j).lower().replace(' ', '_')}")
                     )
                 elif not j.split(None):
                     line.append(
@@ -93,17 +94,17 @@ def stuff_kb(needed: str, remove: bool = False):
             ]
         return False, IKM(media_kb)
 
-def purchase_kb(name):
+def purchase_kb(id):
     purchase = [
-        [KB("💠 Purchase", f"want_{name}")],
+        [KB("💠 Purchase", f"want_{id}")],
         [KB("❌ Close", "close"),
         KB("⬅️ Back", "bback")] #This back will genrate the buy menu again
         ]
     return IKM(purchase)
 
-def remove_kb(name):
+def remove_kb(id):
     purchase = [
-        [KB("🗑 Remove", f"rmwant_{name}")],
+        [KB("🗑 Remove", f"rmwant_{id}")],
         [KB("⬅️ Back", "rmbback"),KB("❌ Close", "close")] #This back will genrate the buy menu again
         ]
     return IKM(purchase)

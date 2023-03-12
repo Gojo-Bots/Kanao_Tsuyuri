@@ -57,18 +57,18 @@ class STUFF(MongoDB):
         else:
             return False
 
-    def get_file_link(self, name: str):
+    def get_file_link(self, id):
         name = name.lower()
-        curr = self.find_one({"name" : name})
+        curr = self.find_one({"f_id" : id})
         if curr:
             s_f_id = [curr["f_id"], curr["file_type"]]
             return s_f_id
         else:
             return False
     
-    def get_file_info(self, name: str):
+    def get_file_info(self, name: str, ftype: str):
         name = name.lower()
-        curr = self.find_one({"name" : name})
+        curr = self.find_one({"name" : name, "type":ftype})
         if curr:
             return curr
         else:
