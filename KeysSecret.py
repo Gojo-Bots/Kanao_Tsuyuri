@@ -23,6 +23,7 @@ x = []
 for i in C:
     x.append(i.strip().lower())
 COIN_NAME = str(getenv("COIN_NAME"))
+COIN_EMOJI = getenv("COIN_EMOJI")
 CATEGORY = x
 AMOUNT = int(getenv("AMOUNT", 5))
 CHAT_ID = int(getenv("CHAT_ID"))

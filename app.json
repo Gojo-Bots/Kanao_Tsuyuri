@@ -60,9 +60,14 @@
             "value": ""
         },
         "COIN_NAME": {
-            "description": "Your custom coin name with emoji",
+            "description": "Your custom coin name without emoji",
             "required": false,
-            "value": "gojocoin 🎫"
+            "value": "gojocoin"
+        },
+        "COIN_EMOJI": {
+            "description": "Your custom coin emoji",
+            "required": false,
+            "value": "🎫"
         },
         "PREMIUM_COST": {
             "description": "Cost of premium channel's link. Default to 50",

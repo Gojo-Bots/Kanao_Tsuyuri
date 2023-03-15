@@ -209,7 +209,7 @@ async def u_info(c: bot, m: Message):
 Here is the info of the user:
 🆔 User Id = `{u_id}`
 🔗 Link created = {link}
-Available coin {COIN_NAME}= `{coin}`
+{COIN_EMOJI} Available coin {COIN_NAME}= `{coin}`
 👥 User joined via user's link = `{joined}`
         """
         await m.reply_text(txt, disable_web_page_preview=True)
@@ -239,17 +239,17 @@ async def cat_adder(c:bot, m:Message):
         await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
         return
 
-@bot.on_message(filters.command(['broadcast'], pre))
-async def broadcaster(c:bot, m: Message):
+@bot.on_message(filters.command(['forward'], pre))
+async def forwarder(c:bot, m: Message):
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
     if not m.reply_to_message:
-        await m.reply_text("Reply to a message to broadcast it")
+        await m.reply_text("Reply to a message to forward it")
         return
     users = USERS.get_all_users()
     i = 0
-    um = await m.reply_text("Broadcasting the message")
+    um = await m.reply_text("Forwarding the message")
     for user in users:
         try:
             await bot.forward_messages(int(user), m.chat.id, m.reply_to_message_id)
@@ -258,9 +258,81 @@ async def broadcaster(c:bot, m: Message):
             pass
     
     await um.delete()
-    await m.reply_text(f"Successfully broadcasted the message to {len(users) - i} out of {len(users)} users")
+    if i == len(users):
+        await m.reply_text("Failed to forward message")
+    await m.reply_text(f"Successfully forwardeded the message to {len(users) - i} out of {len(users)} users")
     return
 
+async def help_broadcast(file,m_id):
+    users = USERS.get_all_users()
+    i = 0
+    for user in users:
+        try:
+            if file.animation:
+                await bot.send_animation(int(user),m_id)
+            elif file.photo:
+                await bot.send_photo(int(user),m_id)
+            elif file.video:
+                await bot.send_video(int(user),m_id)
+            elif file.document:
+                await bot.send_document(int(user),m_id)
+            else:
+                i = "Unsupported file type"
+        except Exception:
+            i += 1
+            pass
+    return i, len(users)
+
+@bot.on_message(filters.command(["broadcast"], pre))
+async def broadcaster(c: bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    if m.chat.type != CT.PRIVATE:
+        await m.reply_text("Meant to be used in private.....however you can use /forward in chats")
+        return
+    if m.reply_to_message:
+        reply_to = m.reply_to_message
+        file = m.reply_to_message_id
+        um = await m.reply_text("Broadcasting message...")
+        x, y = await help_broadcast(reply_to, file)
+        
+        await um.delete()
+        if type(i) == str:
+            await m.reply_text(i)
+            return
+        suc = y-x
+        if not suc:
+            await m.reply_text("Failed to broadcast the message.")
+            return
+        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users")
+        return
+    else:
+        file = await bot.ask(
+            text = "Send me the file\nType /cancel to abort the operation",
+            chat_id = m.from_user.id
+            )
+        z = await bot.send_message(m.chat.id,"File recived hold tight will I fetch data and broadcast it")
+        if is_cancel(file.text):
+            await bot.send_message(m.chat.id,"Aborted the task")
+            return
+        mess = await bot.get_messages(m.chat.id,z.id-1)
+        m_id = mess.id
+        await z.delete()
+        await file.delete()
+        um = await m.reply_text("Broadcasting message...")
+        x = await help_broadcast(mess,m_id)
+        await um.delete()
+        if type(i) == str:
+            await m.reply_text(i)
+            return
+        suc = y-x
+        if not suc:
+            await m.reply_text("Failed to broadcast the message.")
+            return
+        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users")
+        return
+       
 @bot.on_message(filters.command(["gift"], pre))
 async def gift_one(c: bot, m: Message):
     if m.from_user.id != OWNER:
@@ -270,6 +342,7 @@ async def gift_one(c: bot, m: Message):
     if len(split) < 3 and not (len(split) == 2 and m.reply_to_message):
         await m.reply_text("Use /help to see how to use this command")
         return
+    COIN_NAME = COIN_NAME +" "+ COIN_EMOJI
     if len(split) == 3:
         try:
             user = int(split[1])
@@ -285,7 +358,7 @@ async def gift_one(c: bot, m: Message):
             await m.reply_text("User is not registered in my database")
         link = User["link"]
         try:
-            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME}  enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME}")
             return
@@ -316,6 +389,7 @@ async def gift_all(c: bot, m: Message):
         await m.reply_text("Only owner can do it")
         return
     split = m.text.split(None)
+    COIN_NAME = COIN_NAME +" "+ COIN_EMOJI
     if len(split) != 2:
         await m.reply_text("Type /help to see how")
         return
@@ -340,6 +414,9 @@ async def gift_all(c: bot, m: Message):
         l+=1
         pass
     await um.delete()
+    if l == len(links):
+        await m.reply_text("Failed to give any user gifts.")
+        return
     await m.reply_text(f"Successfully given {len(links) - l} out of {len(links)} users {money} {COIN_NAME}")
     return
 
