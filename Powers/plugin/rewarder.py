@@ -5,6 +5,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardButton
 from pyrogram.raw.types import InputPrivacyValueDisallowContacts as IPVDC"""
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
+from KeysSecret import *
 from Powers import *
 from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
@@ -221,7 +222,7 @@ async def premium_channel(c: bot, m: Message):
         return
     else:
         await m.reply_text(
-            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}")
+            f"You Don't have enough {COIN_NAME + ' ' + COIN_EMOJI} to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST} {COIN_NAME + ' ' + COIN_EMOJI}\n🧿 You have: {u_coin} {COIN_NAME + ' ' + COIN_EMOJI}")
         return
 
 @bot.on_callback_query(filters.regex("^premium_link$"), 3)
@@ -257,7 +258,7 @@ async def premium_link(c: bot, q: CallbackQuery):
             ]
         )
         await q.edit_message_text(
-            f"You Don't have enough coin to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST}\n🧿 You have: {u_coin}", reply_markup=back_btn)
+            f"You Don't have enough {COIN_NAME + ' ' + COIN_EMOJI} to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST} {COIN_NAME + ' ' + COIN_EMOJI}\n🧿 You have: {u_coin} {COIN_NAME + ' ' + COIN_EMOJI}", reply_markup=back_btn)
         return
 
 @bot.on_callback_query(filters.regex("^call_") | filters.regex("^rmcall_"), 2)

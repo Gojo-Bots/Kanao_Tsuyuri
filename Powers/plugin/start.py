@@ -559,7 +559,7 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
             return
 
 users = USERS.get_all_users()
-@bot.on_message(filters.chat(CHAT_ID) & ~filters.bot & filters.user(users))
+@bot.on_message(filters.chat(CHAT_ID) & ~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
     u_id = m.from_user.id
     User = USERS(u_id)
@@ -567,7 +567,7 @@ async def message_increaser(c: bot, m: Message):
     link = User["link"]
     if mess >= NUMBER_MESSAGE:
         try:
-            await bot.send_message(u_id, f"You recieved {COIN_MESSAGE} {COIN_NAME}  {COIN_EMOJI} for completing {NUMBER_MESSAGE} in group\nKeep doing message and you will some coin again when you number of messages reaches to {NUMBER_MESSAGE}")
+            await bot.send_message(u_id, f"Keep chatting and you will again get some {COIN_NAME} after {NUMBER_MESSAGE} messages")
             USERS.update_coin(str(link), int(COIN_MESSAGE))
             User.mess_update(True)
             return
