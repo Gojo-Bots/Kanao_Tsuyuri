@@ -55,9 +55,9 @@
             "value": ""
         },
         "PREMIUM_CHANNEL": {
-            "description": "Id of the premium channel",
-            "required": false,
-            "value": ""
+            "description": "Id of the premium channel. Pass 0 if you don't want to set it",
+            "required": true,
+            "value": "0"
         },
         "COIN_NAME": {
             "description": "Your custom coin name without emoji",
@@ -68,6 +68,16 @@
             "description": "Your custom coin emoji",
             "required": false,
             "value": "🎫"
+        },
+        "NUMBER_MESSAGE":{
+            "description": "Number of message after which the user will get some coin",
+            "required": true,
+            "value": 100
+        },
+        "COIN_MESSAGE":{
+            "description": "Coin given to user when he/she send the required number of message",
+            "required": true,
+            "value": 5
         },
         "PREMIUM_COST": {
             "description": "Cost of premium channel's link. Default to 50",

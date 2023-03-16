@@ -49,7 +49,7 @@ def initial_kb(remove: bool = False):
                 elif not j.split("_"):
                     line.append(initial_kb_gen(str(j).capitalize(), f"{'buy' if not remove else 'rmbuy'}_{str(j).lower()}"))
             key.append(line)
-    if not remove:
+    if not remove and PREMIUM_CHANNEL:
         key.extend([
             [
                 KB("❤️‍🔥 Premium Channel", "premium_link")

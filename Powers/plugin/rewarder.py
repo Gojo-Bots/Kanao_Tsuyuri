@@ -199,6 +199,9 @@ async def initial_call(c: bot, q: CallbackQuery):
 
 @bot.on_message(filters.command(["premium"], pre) & filters.private) 
 async def premium_channel(c: bot, m: Message):
+    if not PREMIUM_CHANNEL:
+        await m.reply_text("Premium channel is not available.")
+        return
     u_id = m.from_user.id
     Users = USERS(u_id).get_info()
     if not Users:

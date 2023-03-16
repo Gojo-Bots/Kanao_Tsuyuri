@@ -205,11 +205,13 @@ async def u_info(c: bot, m: Message):
         link = User["link"]
         coin = User["coin"]
         joined = User["joined"]
+        mess = User["message"]
         txt = f"""
 Here is the info of the user:
 🆔 User Id = `{u_id}`
 🔗 Link created = {link}
-{COIN_EMOJI} Available coin {COIN_NAME}= `{coin}`
+{COIN_EMOJI} Available coin {COIN_NAME} = `{coin}`
+✉️ No. of message required to get coin = {NUMBER_MESSAGE-int(mess)}
 👥 User joined via user's link = `{joined}`
         """
         await m.reply_text(txt, disable_web_page_preview=True)
@@ -553,3 +555,22 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
             return
         except AttributeError:
             return
+
+users = USERS.get_all_users()
+@bot.on_message(filters.chat(CHAT_ID) & ~filters.bot & filters.user(users))
+async def message_increaser(c: bot, m: Message):
+    u_id = m.from_user.id
+    User = USERS(u_id)
+    mess = User["message"]
+    link = User["link"]
+    if mess >= NUMBER_MESSAGE:
+        try:
+            await bot.send_message(u_id, f"You recieved {COIN_MESSAGE} {COIN_NAME}  {COIN_EMOJI} for completing {NUMBER_MESSAGE} in group\nKeep doing message and you will some coin again when you number of messages reaches to {NUMBER_MESSAGE}")
+            USERS.update_coin(str(link), int(COIN_MESSAGE))
+            User.mess_update(True)
+            return
+        except Exception:
+            return
+    elif mess <= NUMBER_MESSAGE:
+        User.mess_update()
+        return

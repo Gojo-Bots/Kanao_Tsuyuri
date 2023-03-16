@@ -22,9 +22,15 @@
 
 `CHAT_ID` Id of the chat in which u have to add members
 
-`PREMIUM_CHANNEL` Id of the premium channel
+`PREMIUM_CHANNEL` Id of the premium channel. Pass 0 if you don't want to set it
 
-`COIN_NAME` Your custom coin name with emoji
+`COIN_NAME` Your custom coin name without emoji
+
+`COIN_EMOJI` Your custom coin emoji
+
+`NUMBER_MESSAGE` Number of message after which the user will get some coin
+
+`COIN_MESSAGE` Coin given to user when he/she send the required number of message
 
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 

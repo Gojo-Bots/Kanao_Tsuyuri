@@ -23,7 +23,7 @@ class USERS(MongoDB):
                 return False
         
 
-    def save_user(self, link: str, coin: int = 0, joined: int = 0, d_joined = 0):
+    def save_user(self, link: str, coin: int = 0, joined: int = 0, mess: int = 0):
         with INSERTION_LOCK:
             curr = self.find_one({"user_id": self.user_id})
             if not curr:
@@ -33,7 +33,7 @@ class USERS(MongoDB):
                         "link" : link,
                         "coin" : coin,
                         "joined" : joined,
-                        "d_not_joined" : d_joined
+                        "message" : mess
                     }
                 )
             else:
@@ -45,6 +45,22 @@ class USERS(MongoDB):
             if curr:
                 link = curr["link"]
                 return link
+            else:
+                return False
+
+    def mess_update(self, is_reset:bool = False):
+        with INSERTION_LOCK:
+            curr = self.find_one({"user_id": self.user_id})
+            if curr:
+                if not is_reset:
+                    mess = int(curr["message"]) + 1
+                else:
+                    mess = 0
+                self.update(
+                    {"user_id" : self.user_id},
+                    {"message" : mess}
+                )
+                return
             else:
                 return False
 
@@ -64,7 +80,7 @@ class USERS(MongoDB):
             collection = MongoDB(USERS.db_name)
             curr = collection.find_all()
             if curr:
-                users= [i["user_id"] for i in curr]
+                users= [int(i["user_id"]) for i in curr]
                 return users
             else:
                 return False
