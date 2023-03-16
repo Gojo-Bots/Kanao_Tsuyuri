@@ -1,4 +1,6 @@
-help_txt = """
+from KeysSecret import COIN_EMOJI, COIN_MESSAGE, COIN_NAME, NUMBER_MESSAGE
+
+help_txt = f"""
 Type /link in the chat to get invite link of the chat.
 Per join with you link will reward you some coin, which will further used to buy stuffs.
 
@@ -14,6 +16,8 @@ and the user joined by that link will not considered as any base to give reward 
 /premium: To get link of premium channel. Works only in private chat
 
 /buy : To buy stuffs. Works only in private chat
+
+**YOU WILL GET {COIN_MESSAGE} {COIN_NAME + " " + COIN_EMOJI} WHEN YOU SEND {NUMBER_MESSAGE} IN THE CHAT**
 
 **OWNER ONLY**
 /addfile : To add file

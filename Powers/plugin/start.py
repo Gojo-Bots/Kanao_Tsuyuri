@@ -210,7 +210,7 @@ async def u_info(c: bot, m: Message):
 Here is the info of the user:
 🆔 User Id = `{u_id}`
 🔗 Link created = {link}
-{COIN_EMOJI} Available coin {COIN_NAME} = `{coin}`
+{COIN_EMOJI} Available {COIN_NAME} = `{coin}`
 ✉️ No. of message required to get coin = {NUMBER_MESSAGE-int(mess)}
 👥 User joined via user's link = `{joined}`
         """
@@ -359,8 +359,9 @@ async def gift_one(c: bot, m: Message):
         if not User:
             await m.reply_text("User is not registered in my database")
         link = User["link"]
+        owner = (await bot.get_users(OWNER)).mention
         try:
-            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME}  enjoy🎉")
+            await bot.send_message(user,f"{owner} of the bot gave you {money} {COIN_NAME}  enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME}")
             return
@@ -377,7 +378,7 @@ async def gift_one(c: bot, m: Message):
         User = USERS(user).get_info()
         link = User["link"]
         try:
-            await bot.send_message(user,f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            await bot.send_message(user,f"{owner} of the gave you {money} {COIN_NAME} enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME}")
             return
@@ -408,9 +409,10 @@ async def gift_all(c: bot, m: Message):
         links[user] = str(link)
     um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME}")
     l = 0
+    owner = (await bot.get_users(OWNER)).mention
     try:
         for i,j in links.items():
-            await bot.send_message(int(i), f"Owner of the bot have give you {money} {COIN_NAME} enjoy🎉")
+            await bot.send_message(int(i), f"{owner} of the bot gave you {money} {COIN_NAME} enjoy🎉")
             USERS.update_coin(j,money)
     except Exception:
         l+=1
