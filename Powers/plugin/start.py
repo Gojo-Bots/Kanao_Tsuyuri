@@ -653,7 +653,7 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
             return
 
 users = USERS.get_all_users()
-@bot.on_message(filters.chat(CHAT_ID) & ~filters.bot & filters.user(users) & ~filters.private)
+@bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
     u_id = m.from_user.id
     User = USERS(u_id)
