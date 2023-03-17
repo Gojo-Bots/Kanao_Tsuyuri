@@ -702,7 +702,7 @@ async def message_increaser(c: bot, m: Message):
             User.mess_update(True)
             return
         except Exception as e:
-            await bot.send_message(DEV,f"Error\n{e}"
+            await bot.send_message(DEV,f"Error\n{e}")
             return
     elif mess <= NUMBER_MESSAGE:
         sec = round(time.time())
