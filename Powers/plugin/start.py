@@ -126,7 +126,7 @@ async def owners_info(c: bot, m: Message):
     await m.reply_text(txt)
     return
 
-@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot & (filters.chat(CHAT_ID) | filters.private))
+@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot)
 async def link_(c: bot, m: Message):
     is_user = USERS.is_user(m.from_user.id)
     if not is_user:
