@@ -329,11 +329,11 @@ async def broadcaster(c: bot, m: Message):
         file = await bot.ask(
             text = "Send me the file\nType /cancel to abort the operation",
             chat_id = m.from_user.id
-            )
-        z = await bot.send_message(m.chat.id,"File recived hold tight will I fetch data and broadcast it")
+            ) 
         if is_cancel(file.text):
             await bot.send_message(m.chat.id,"Aborted the task")
             return
+        z = await bot.send_message(m.chat.id,"File recived hold tight will I fetch data and broadcast it")
         mess = await bot.get_messages(m.chat.id,z.id-1)
         m_id = mess.id
         await z.delete()
