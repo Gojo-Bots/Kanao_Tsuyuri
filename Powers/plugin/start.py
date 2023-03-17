@@ -714,5 +714,5 @@ async def message_increaser(c: bot, m: Message):
         except KeyError:
             spam[u_id] = [["x"],[sec]]
                 
-        User.mess_update()
+        USERS(u_id).mess_update()
         return
