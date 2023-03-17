@@ -561,10 +561,10 @@ async def rename_f(c: bot,  m: Message):
     except IndexError:
         await m.reply_text("See help to know how to use this cmd")
         return
-    keys = splited.split("|").strip()
+    keys = splited.split("|")
     try:
-        old = keys[0]
-        new = keys[1]
+        old = keys[0].strip()
+        new = keys[1].strip()
     except IndexError:
         await m.reply_text("See help to know how to use this cmd")
         return
