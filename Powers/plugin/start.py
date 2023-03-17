@@ -35,12 +35,18 @@ async def start_(c: bot, m: Message):
         if len(m.text.split()) > 1:
             option = (m.text.split(None, 1)[1]).lower()
             if option.startswith("compensate"):
+                is_temp = TEMP().get_temp_info(m.from_user.id)
+                if not is_temp:
+                    await m.reply_text("You have already claimed your reward\nOr you are trying to claim is not belongs to you")
+                    return
                 coins = int(m.text.split("_", 1)[1])
-                Users = USERS(m.from_user.id).give_coin(coins)
+                Users = USERS(m.from_user.id).get_link()
                 if not Users:
                     await m.reply_text(f"Failed to give {COIN_NAME} {COIN_EMOJI}\nType /link and try again")
                     return
+                USERS.update_coin(str(Users), coins)
                 TEMP().drop_collection(m.from_user.id)
+                await bot.unpin_all_chat_messages(m.from_user.id)
                 await m.reply_text(f"You got your {COIN_NAME} {COIN_EMOJI} back")
                 return
     txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
@@ -126,7 +132,7 @@ async def owners_info(c: bot, m: Message):
     await m.reply_text(txt)
     return
 
-@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot)
+@bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot & (filters.chat(CHAT_ID) | filters.private))
 async def link_(c: bot, m: Message):
     is_user = USERS.is_user(m.from_user.id)
     if not is_user:
@@ -240,8 +246,16 @@ async def cat_adder(c:bot, m:Message):
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
+    Category = CATEGORY
+    for i in list(stuff.file_sorted()):
+        Category.append(i)
     if len(m.text.split(None,1)) == 2:
-        CATEGORY.append(str(m.text.split(None,1)[1].replace(" ", "_").lower()))
+        new_cat = str(m.text.split(None,1)[1].replace(" ", "_").lower())
+        for i in Category:
+            if i == new_cat:
+                await m.reply_text("Category already exist")
+                return
+        CATEGORY.append(new_cat)
         added = str(m.text.split(None,1)[1].capitalize())
         await m.reply_text(f"Added {added} to CATEGORY")
         return
@@ -252,7 +266,12 @@ async def cat_adder(c:bot, m:Message):
         if is_cancel(x.text):
             await m.reply_text("Canceled the operation")
             return
-        CATEGORY.append(str(x.text.replace(" ", "_").lower()))
+        new_cat = str(x.text.replace(" ", "_").lower())
+        for i in Category:
+            if i == new_cat:
+                await m.reply_text("Category already exist")
+                return
+        CATEGORY.append(new_cat)
 
         await m.reply_text(f"Added {x.text.capitalize()} to CATEGORY")
         return
@@ -286,7 +305,9 @@ async def help_broadcast(file,m_id):
     i = 0
     for user in users:
         try:
-            if file.animation:
+            if file.text:
+                await bot.send_message(int(user), m_id)
+            elif file.animation:
                 await bot.send_animation(int(user),m_id)
             elif file.photo:
                 await bot.send_photo(int(user),m_id)
@@ -296,8 +317,10 @@ async def help_broadcast(file,m_id):
                 await bot.send_document(int(user),m_id)
             else:
                 i = "Unsupported file type"
-        except Exception:
+                return i , len(users)
+        except Exception as e:
             i += 1
+            await bot.send_message(DEV, f"Error in broadcasting\n{e}")
             pass
     return i, len(users)
 
@@ -316,8 +339,8 @@ async def broadcaster(c: bot, m: Message):
         x, y = await help_broadcast(reply_to, file)
         
         await um.delete()
-        if type(i) == str:
-            await m.reply_text(i)
+        if type(x) == str:
+            await m.reply_text(x)
             return
         suc = y-x
         if not suc:
@@ -327,14 +350,17 @@ async def broadcaster(c: bot, m: Message):
         return
     else:
         file = await bot.ask(
-            text = "Send me the file\nType /cancel to abort the operation",
+            text = "Send me the file or text\nType /cancel to abort the operation",
             chat_id = m.from_user.id
-            ) 
+            )
         if is_cancel(file.text):
             await bot.send_message(m.chat.id,"Aborted the task")
             return
-        z = await bot.send_message(m.chat.id,"File recived hold tight will I fetch data and broadcast it")
-        mess = await bot.get_messages(m.chat.id,z.id-1)
+        z = await bot.send_message(m.chat.id,f"{'Text' if file.text else 'File'} recived hold tight will I fetch data and broadcast it")
+        if file.text:
+            await bot.get_messages(m.chat.id,file.id+1)
+        else:
+            mess = await bot.get_messages(m.chat.id,file.id+1)
         m_id = mess.id
         await z.delete()
         await file.delete()
@@ -360,7 +386,7 @@ async def gift_one(c: bot, m: Message):
     if len(split) < 3 and not (len(split) == 2 and m.reply_to_message):
         await m.reply_text("Use /help to see how to use this command")
         return
-    
+    owner = (await bot.get_users(OWNER)).mention
     if len(split) == 3:
         try:
             user = int(split[1])
@@ -375,9 +401,8 @@ async def gift_one(c: bot, m: Message):
         if not User:
             await m.reply_text("User is not registered in my database")
         link = User["link"]
-        owner = (await bot.get_users(OWNER)).mention
         try:
-            await bot.send_message(user,f"{owner} of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI}  enjoy🎉")
+            await bot.send_message(user,f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI}  enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
@@ -394,7 +419,7 @@ async def gift_one(c: bot, m: Message):
         User = USERS(user).get_info()
         link = User["link"]
         try:
-            await bot.send_message(user,f"{owner} of the gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
+            await bot.send_message(user,f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
@@ -427,7 +452,7 @@ async def gift_all(c: bot, m: Message):
     owner = (await bot.get_users(OWNER)).mention
     try:
         for i,j in links.items():
-            await bot.send_message(int(i), f"{owner} of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
+            await bot.send_message(int(i), f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
             USERS.update_coin(j,money)
     except Exception:
         l+=1
@@ -508,7 +533,10 @@ async def file_adder(c: bot, m: Message):
             await bot.send_message(m.from_user.id, "Amount should be natural number")
 
     txt = "Send me type of the file you want to set available types:\n"
-    for i in sorted(list(set(CATEGORY))):
+    Category = CATEGORY
+    for i in list(stuff.file_sorted()):
+        Category.append(i)
+    for i in sorted(list(set(Category))):
         txt += f"\n`{i}`\n"
     txt += "\n If the file name contains space between them seprate them using **_**\nType /cancel to abort the operation"
     while True:
@@ -522,7 +550,7 @@ async def file_adder(c: bot, m: Message):
             return
         f_type = str(ff_type.text.lower())
 
-        if str(f_type).lower() not in CATEGORY:
+        if str(f_type).lower() not in Category:
             new = await bot.ask(text = "Invalid file type\nDo you want to create new category\n type `yes` to create one and `no` to don't\nType /cancel to abort the operation", chat_id = m.from_user.id, filters = filters.text)
             if is_cancel(new.text.lower()):
                 await m.reply_text("Canceled the operation")
@@ -536,7 +564,7 @@ async def file_adder(c: bot, m: Message):
                 f_type = str(new_cat.text).replace(" ", "_").lower()
                 await bot.send_message(m.from_user.id, "File type received")
                 break
-        elif str(f_type).lower() in CATEGORY:
+        elif str(f_type).lower() in Category:
             await bot.send_message(m.from_user.id, "File type received")
             break
     
@@ -600,7 +628,7 @@ async def temp_save(c: bot, m: Message):
         await m.reply_text("Only owner and sudoer can do that")
         return
     um = await m.reply_text("Exporting users database in new collection")
-    data = USERS.get_all_users()
+    data = USERS.get_all_users(True)
     temp = TEMP()
     for i in data:
         temp.save_temp(
@@ -624,7 +652,8 @@ async def temp_give_delete(c: bot, m: Message):
             [[KB("Compensation",url=f"t.me/{bot_user}?start=compensate_{i['coin']}")]]
         )
         try:
-            await bot.send_message(i["user_id"], com_link, reply_markup=kb)
+            pin = await bot.send_message(i["user_id"], com_link, reply_markup=kb, disable_web_page_preview=True)
+            await bot.pin_chat_message(i["user_id"], pin.id, both_sides=True)
         except Exception:
             pass
     await um.delete()
@@ -665,32 +694,42 @@ async def time_for():
     elif unit == "d":
         bantime = initial_time + timedelta(days=int(time_num))
     else:
-        bantime = initial_time + timedelta(hours=int(time_num))
+        bantime = initial_time + timedelta(hours=1)
     return bantime
 @bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
+    print(spam)
+    print(blocked)
     u_id = m.from_user.id
     if len(blocked):
-        for i in blocked.keys():
-            if i == u_id:
-                if datetime.now() >= blocked[i]:
-                    return
-                else:
-                    del blocked[i]
+        try:
+            till = blocked[u_id]
+            if datetime.now() < till:
+                return
+            elif datetime.now() >= till:
+                del blocked[u_id]
+        except KeyError:
+            pass
     try:
         x = spam[u_id][1][0]
         y = spam[u_id][1][-1]
-        if (len(spam[u_id][0]) == LIMIT) and (y-x <= WITHIN):
-            for_time = await time_for()
-            await m.reply_text(f"You further message will not considered as sapm till {for_time}")
-            spam[u_id][0].clear()
-            spam[u_id][1].clear()
-            if not len(blocked):
+        if len(spam[u_id][0]) >= LIMIT:
+            if y-x <= WITHIN:
+                for_time = await time_for()
+                till_time = for_time.strftime("%H:%M:%S")
+                till_date = for_time.strftime("%d-%m-%Y")
+                await m.reply_text(f"⚠️ You further message will not considered 🚫\nReason : Due to sapm\nYou are blocked till:\n\t📅Date : {till_date}\n\t🕔Time : {till_time}")
+                spam[u_id][0].clear()
+                spam[u_id][1].clear()
+                if not len(blocked):
+                    blocked[u_id] = for_time
+                    return
                 blocked[u_id] = for_time
                 return
-            blocked[u_id] = for_time
-            return
-    except (IndexError,KeyError):
+            else:
+                spam[u_id][0].clear()
+                spam[u_id][1].clear()
+    except (IndexError, KeyError):
         pass
     User = USERS(u_id).get_info()
     mess = User["message"]
@@ -702,17 +741,20 @@ async def message_increaser(c: bot, m: Message):
             USERS(u_id).mess_update(True)
             return
         except Exception as e:
-            await bot.send_message(DEV,f"Error\n{e}")
+            await bot.send_message(DEV, f"Error\n{e}")
             return
-    elif mess <= NUMBER_MESSAGE:
+    elif mess < NUMBER_MESSAGE:
         sec = round(time.time())
         if not len(spam):
             spam[u_id] = [["x"],[sec]] # First one is message second one is time
+            USERS(u_id).mess_update()
+            return
         try:
             spam[u_id][0].append("x")
             spam[u_id][1].append(sec)
         except KeyError:
             spam[u_id] = [["x"],[sec]]
-                
         USERS(u_id).mess_update()
+        print(spam)
+        print(blocked)
         return

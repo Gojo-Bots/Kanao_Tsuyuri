@@ -94,24 +94,26 @@ def stuff_kb(needed: str, remove: bool = False):
             ]
         return False, IKM(media_kb)
 
-def purchase_kb(id):
+def purchase_kb(id,ftype):
     purchase = [
         [KB("💠 Purchase", f"want_{id}")],
-        [KB("❌ Close", "close"),
-        KB("⬅️ Back", "bback")] #This back will genrate the buy menu again
+        [KB("⬅️ Back", f"bback_{ftype}"),
+        KB("❌ Close", "close")] #This back will genrate the buy menu again
         ]
     return IKM(purchase)
 
-def remove_kb(id):
+def remove_kb(id, ftype):
     purchase = [
         [KB("🗑 Remove", f"rmwant_{id}")],
-        [KB("⬅️ Back", "rmbback"),KB("❌ Close", "close")] #This back will genrate the buy menu again
+        [KB("⬅️ Back", f"rmbback_{ftype}"),KB("❌ Close", "close")] #This back will genrate the buy menu again
         ]
     return IKM(purchase)
 
-purchased = [
-    [
-        KB("⬅️ Back", "bback"),
-        KB("❌ Close", "close")
+def purchased_kb(ftype, remove=False):
+    purchased = [
+        [
+            KB("⬅️ Back", f"{'bback' if not remove else 'rmbback'}_{ftype}"),
+            KB("❌ Close", "close")
+        ]
     ]
-]
+    return purchased

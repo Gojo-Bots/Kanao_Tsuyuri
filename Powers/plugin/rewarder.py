@@ -94,12 +94,12 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.edit_message_text(f"Failed to change the menu due to\n{e}")
             print(e)
             return
+
+@bot.on_callback_query(filters.regex("^rmbback") | filters.regex("^bback"))
+async def after_rm_back(c:bot, q: CallbackQuery):
+    call,need = q.data.split("_",1)
     if call == "rmbback":
         try:
-            caption = q.message.text.split(None)
-            for i in caption:
-                if i.lower() in CATEGORY:
-                    need = i.lower()
             is_present, key = stuff_kb(need, remove=True)
             if is_present:
                 await q.edit_message_text(
@@ -120,10 +120,6 @@ async def initial_call(c: bot, q: CallbackQuery):
             return
     if call == "bback":
         try:
-            caption = q.message.text.split(None)
-            for i in caption:
-                if i.lower() in CATEGORY:
-                    need = i.lower()
             is_present, key = stuff_kb(need)
             if is_present:
                 await q.edit_message_text(
@@ -147,13 +143,17 @@ async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
     Stuff = STUFF()
-    data = q.data.split("_",1)[-1].split("/")[0]
-    data2 = q.data.split("/",1)[-1]
+    split = q.data.split("_",1)[-1]
+    data = split.split("/")[0]
+    data2 = split.split("/",1)[-1].replace("_", " ")
     required = Stuff.get_file_info(data2,data)
+    if not required:
+        data2 = split.split("/",1)[-1].replace(" ", "_")
+        required = Stuff.get_file_info(data2,data)
     s_file = required["f_id"]
     if q.data.split("_",1)[0] == "rmwant":
         Stuff.remove_file(s_file)
-        await q.edit_message_text("Removed the file")
+        await q.edit_message_text("Removed the file", reply_markup=IKM(purchased_kb(data, True)))
         await q.answer("Removed")
         return
     if True:
@@ -174,7 +174,7 @@ async def initial_call(c: bot, q: CallbackQuery):
                     rules =[]
                 )
             )"""
-            await q.edit_message_reply_markup(IKM(purchased))
+            await q.edit_message_reply_markup(IKM(purchased_kb(data)))
             try:
                 if s_type == "document":
                     await q.message.reply_document(s_file, caption="Here is your delivery")
@@ -271,7 +271,14 @@ async def buy_menu(c: bot, q: CallbackQuery):
     ftype = split[-1].split("/")[0]
     data = rsplit[-1]
     name = str(data).replace("_", " ")
-    file = Stuff.get_file_info(data,ftype)
+    file = Stuff.get_file_info(name,ftype)
+    if not file:
+        name = str(data).replace(" ", "_")
+        file = Stuff.get_file_info(name,ftype)
+        if not file:
+            dev = (await bot.get_users(DEV)).username
+            await q.edit_message_text(f"Error occured\nreport it to {dev}")
+            return
     f_name = file["name"].lower().capitalize()
     amount = file["ncoin"]
     f_category = file["type"]
@@ -280,8 +287,8 @@ Name : {f_name}
 CATEGORY : {f_category}
 Amount : {amount}
     """
-    key = purchase_kb(q.data.split("_",1)[-1])
+    key = purchase_kb(q.data.split("_",1)[-1], ftype)
     if split[0] == "rmcall":
-        key = remove_kb()
+        key = remove_kb(q.data.split("_",1)[-1], ftype)
     await q.edit_message_text(txt, reply_markup=key)
     return

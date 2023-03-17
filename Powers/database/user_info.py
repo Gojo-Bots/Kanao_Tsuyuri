@@ -38,16 +38,6 @@ class USERS(MongoDB):
             else:
                 return False
 
-    def give_coin(self, coin):
-        with INSERTION_LOCK:
-            curr = self.find_one({"user_id": self.user_id})
-            if curr:
-                self.update(
-                    {"user_id": self.user_id},
-                    {"coin": int(coin)}
-                )
-            return False
-
     def get_link(self):
         with INSERTION_LOCK:
             curr = self.find_one({"user_id": self.user_id})

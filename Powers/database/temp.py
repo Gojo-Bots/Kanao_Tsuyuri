@@ -29,6 +29,14 @@ class TEMP(MongoDB):
             curr = self.find_all()
             return curr
 
+    def get_temp_info(self, user):
+        with INSERTION_LOCK:
+            curr = self.find_one({"user_id": user})
+            if curr:
+                return True
+            else:
+                return False
+
     def drop_collection(self,user):
         with INSERTION_LOCK:
-            self.delete_one(user)
+            self.delete_one({"user_id": user})
