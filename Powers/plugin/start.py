@@ -701,7 +701,8 @@ async def message_increaser(c: bot, m: Message):
             USERS.update_coin(str(link), int(COIN_MESSAGE))
             User.mess_update(True)
             return
-        except Exception:
+        except Exception as e:
+            await bot.send_message(DEV,f"Error\n{e}"
             return
     elif mess <= NUMBER_MESSAGE:
         sec = round(time.time())
