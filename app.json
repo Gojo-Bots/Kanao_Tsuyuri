@@ -90,7 +90,7 @@
             "value":5
         },
         "TIME":{
-            "description": "For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days",
+            "description": "For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days. Don't give space between time and unit give it in same format given below",
             "required": true,
             "value": "1h"
         },
