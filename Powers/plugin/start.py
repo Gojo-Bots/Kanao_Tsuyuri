@@ -377,9 +377,9 @@ async def gift_one(c: bot, m: Message):
         link = User["link"]
         owner = (await bot.get_users(OWNER)).mention
         try:
-            await bot.send_message(user,f"{owner} of the bot gave you {money} {COIN_NAME +" "+ COIN_EMOJI}  enjoy🎉")
+            await bot.send_message(user,f"{owner} of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI}  enjoy🎉")
             USERS.update_coin(str(link), money)
-            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +" "+ COIN_EMOJI}")
+            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
         except Exception:
             await m.reply_text("Tell the user to start the bot first")
@@ -394,9 +394,9 @@ async def gift_one(c: bot, m: Message):
         User = USERS(user).get_info()
         link = User["link"]
         try:
-            await bot.send_message(user,f"{owner} of the gave you {money} {COIN_NAME +" "+ COIN_EMOJI} enjoy🎉")
+            await bot.send_message(user,f"{owner} of the gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
             USERS.update_coin(str(link), money)
-            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +" "+ COIN_EMOJI}")
+            await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
         except Exception:
             await m.reply_text("Tell the user to start the bot first")
@@ -422,12 +422,12 @@ async def gift_all(c: bot, m: Message):
         User = USERS(user).get_info()
         link = User["link"]
         links[user] = str(link)
-    um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +" "+ COIN_EMOJI}")
+    um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +' '+ COIN_EMOJI}")
     l = 0
     owner = (await bot.get_users(OWNER)).mention
     try:
         for i,j in links.items():
-            await bot.send_message(int(i), f"{owner} of the bot gave you {money} {COIN_NAME +" "+ COIN_EMOJI} enjoy🎉")
+            await bot.send_message(int(i), f"{owner} of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
             USERS.update_coin(j,money)
     except Exception:
         l+=1
@@ -436,7 +436,7 @@ async def gift_all(c: bot, m: Message):
     if l == len(links):
         await m.reply_text("Failed to give any user gifts.")
         return
-    await m.reply_text(f"Successfully given {len(links) - l} out of {len(links)} users {money} {COIN_NAME +" "+ COIN_EMOJI}")
+    await m.reply_text(f"Successfully given {len(links) - l} out of {len(links)} users {money} {COIN_NAME +' '+ COIN_EMOJI}")
     return
 
 @bot.on_message(filters.command(["addfile"], pre) & filters.private)
