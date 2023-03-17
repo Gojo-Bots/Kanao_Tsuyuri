@@ -1,3 +1,6 @@
+import time
+from datetime import datetime, timedelta
+
 from pyrogram.enums import ChatType as CT
 from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup as IKM
@@ -651,11 +654,45 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
             return
         except AttributeError:
             return
-
+spam = {}
+blocked = {}
 users = USERS.get_all_users()
+async def time_for():
+    initial_time = datetime.now()
+    if unit == "m":
+        bantime = initial_time + timedelta(minutes=int(time_num))
+    elif unit == "h":
+        bantime = initial_time + timedelta(hours=int(time_num))
+    elif unit == "d":
+        bantime = initial_time + timedelta(days=int(time_num))
+    else:
+        bantime = initial_time + timedelta(hours=int(time_num))
+    return bantime
 @bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
     u_id = m.from_user.id
+    if len(blocked):
+        for i in blocked.keys():
+            if i == u_id:
+                if datetime.now() >= blocked[i]:
+                    return
+                else:
+                    del blocked[i]
+    try:
+        x = spam[u_id][1][0]
+        y = spam[u_id][1][-1]
+        if (len(spam[u_id][0]) == LIMIT) and (y-x <= WITHIN):
+            for_time = await time_for()
+            await m.reply_text(f"You further message will not considered as sapm till {for_time}")
+            spam[u_id][0].clear()
+            spam[u_id][1].clear()
+            if not len(blocked):
+                blocked[u_id] = for_time
+                return
+            blocked[u_id] = for_time
+            return
+    except IndexError:
+        pass
     User = USERS(u_id)
     mess = User["message"]
     link = User["link"]
@@ -668,5 +705,14 @@ async def message_increaser(c: bot, m: Message):
         except Exception:
             return
     elif mess <= NUMBER_MESSAGE:
+        sec = round(time.time())
+        if not len(spam):
+            spam[u_id] = [["x"],[sec]] # First one is message second one is time
+        for i in spam.keys():
+            if i != u_id:
+                spam[u_id] = [["x"],[sec]]
+            else:
+                spam[u_id][0].append("x")
+                spam[u_id][1].append(sec)
         User.mess_update()
         return

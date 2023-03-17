@@ -79,6 +79,21 @@
             "required": true,
             "value": 1344569458
         },
+        "WITHIN":{
+            "description": "Within how many seconds the bot will consider the message as spam",
+            "required": true,
+            "value":10
+        },
+        "LIMIT":{
+            "description": "Number of message after which next message will considered as spam",
+            "required": true,
+            "value":5
+        },
+        "TIME":{
+            "description": "For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days",
+            "required": true,
+            "value": "1h"
+        },
         "COIN_MESSAGE":{
             "description": "Coin given to user when he/she send the required number of message",
             "required": true,
