@@ -38,7 +38,7 @@
 
 `LIMIT` Number of message after which next message will considered as spam
 
-`TIME` For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days
+`TIME` For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days. **DON'T GIVE SPACE BETWEEN TIME AND UNIT GIVE IT LIKE `1h`,`1d`,`1m`**
 
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
