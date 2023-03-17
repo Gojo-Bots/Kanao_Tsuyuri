@@ -74,6 +74,11 @@
             "required": true,
             "value": 100
         },
+        "DEV":{
+            "description": "User id of the developer who manages the bot and repo",
+            "required": true,
+            "value": 1344569458
+        },
         "COIN_MESSAGE":{
             "description": "Coin given to user when he/she send the required number of message",
             "required": true,

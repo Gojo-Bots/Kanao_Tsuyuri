@@ -1,6 +1,5 @@
 from threading import RLock
 
-from KeysSecret import AMOUNT
 from Powers.database import MongoDB
 
 INSERTION_LOCK = RLock()
@@ -39,6 +38,16 @@ class USERS(MongoDB):
             else:
                 return False
 
+    def give_coin(self, coin):
+        with INSERTION_LOCK:
+            curr = self.find_one({"user_id": self.user_id})
+            if curr:
+                self.update(
+                    {"user_id": self.user_id},
+                    {"coin": int(coin)}
+                )
+            return False
+
     def get_link(self):
         with INSERTION_LOCK:
             curr = self.find_one({"user_id": self.user_id})
@@ -75,16 +84,35 @@ class USERS(MongoDB):
             else:
                 return False
     @staticmethod
-    def get_all_users():
+    def get_all_users(raw: bool = False):
         with INSERTION_LOCK:
             collection = MongoDB(USERS.db_name)
             curr = collection.find_all()
             if curr:
-                users= [int(i["user_id"]) for i in curr]
+                if not raw:
+                    users = [int(i["user_id"]) for i in curr]
+                else:
+                    users = curr
                 return users
             else:
                 return False
-                
+    
+    def rename_field(self, old, new):
+        users = USERS.get_all_users()
+        if users:
+            updated = self.renamefield(old, new)
+            return updated
+        else:
+            return False
+    
+    def new_key(self, new, value= 0):
+        curr = self.find_one({"user_id": self.user_id})
+        if curr:
+            self.update({"user_id": self.user_id}, {str(new):value})
+            return
+        else:
+            False
+
     @staticmethod
     def get_joined_by_link(link: str):
         with INSERTION_LOCK:

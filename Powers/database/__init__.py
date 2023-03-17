@@ -1,6 +1,6 @@
 from sys import exit as exiter
 
-from pymongo import MongoClient, ASCENDING
+from pymongo import ASCENDING, MongoClient
 from pymongo.errors import PyMongoError
 
 from KeysSecret import DB_NAME, DB_URI
@@ -50,6 +50,13 @@ class MongoDB:
         new = self.collection.find_one({"_id": _id})
         return old, new
 
+    def renamefield(self, old: str, new: str):
+        updated = self.collection.update_many(
+            {},
+            {"$rename": {old : new}}
+        )
+        modified = updated.modified_count
+        return modified
 
     def update(self, query, update):
         result = self.collection.update_one(query, {"$set": update})

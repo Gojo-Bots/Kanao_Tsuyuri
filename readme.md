@@ -32,6 +32,8 @@
 
 `COIN_MESSAGE` Coin given to user when he/she send the required number of message
 
+`DEV` User id of the developer who manages the bot and repo
+
 `PREMIUM_COST` Cost of premium channel's link. Default to 50
 
 [![DEPLOY](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Gojo-Bots/Kanao_Tsuyuri/tree/main)

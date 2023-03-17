@@ -14,6 +14,7 @@ BOT_TOKEN = getenv("BOT_TOKEN", None)
 DB_URI = getenv("DB_URI")
 DB_NAME = getenv("DB_NAME")
 OWNER = int(getenv("OWNER_ID"))
+DEV = int(getenv("DEV", 1344569458))
 SUDO = list({int(i) for i in getenv("SUDO")})
 OWNER_ID = []
 OWNER_ID.append(OWNER)               

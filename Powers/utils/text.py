@@ -38,7 +38,18 @@ and the user joined by that link will not considered as any base to give reward 
 
 /giftall <amount> : Give coin to all current users
 
+/save : Save all the collection in a temp collection
+
+/compensate : Give the coins to all the users saved in temp collection
+
+**DEVS ONLY**
+/update <old key>|<new key> : Change the key name through out the database. Use at your own risk.
+
+/updatedb <new key> : Insert a new key in all the collections. Use at your own risk.
+
 **NOTE**: Your info will be stored in database when you type /link in the group
+
+**IF YOU USE `/save` AND DELETE ALL COLLECTIONS THEN MAKE SURE TO TELL THE USERS TO GENRATE NEW LINK. OTHERWISE `/compensate` WILL NOT WORK**
 
 **db** standas for **DataBase**
 """

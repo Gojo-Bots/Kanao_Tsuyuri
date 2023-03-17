@@ -5,6 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup as IKM
 from KeysSecret import *
 from Powers import *
 from Powers.database.stuffs import STUFF
+from Powers.database.temp import TEMP
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
 from Powers.utils.text import help_txt
@@ -27,6 +28,18 @@ back_kb = IKM(
 @bot.on_message(filters.command(["start"], pre))
 async def start_(c: bot, m: Message):
     owner_user = (await bot.get_users(OWNER)).username
+    if m.chat.type == CT.PRIVATE:
+        if len(m.text.split()) > 1:
+            option = (m.text.split(None, 1)[1]).lower()
+            if option.startswith("compensate"):
+                coins = int(m.text.split("_", 1)[1])
+                Users = USERS(m.from_user.id).give_coin(coins)
+                if not Users:
+                    await m.reply_text(f"Failed to give {COIN_NAME} {COIN_EMOJI}\nType /link and try again")
+                    return
+                TEMP().drop_collection(m.from_user.id)
+                await m.reply_text(f"You got your {COIN_NAME} {COIN_EMOJI} back")
+                return
     txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
     if m.chat.type == CT.PRIVATE:
         await bot.send_message(m.chat.id, txt, reply_markup=help_kb(owner_user))
@@ -534,6 +547,87 @@ async def file_adder(c: bot, m: Message):
     else:
         await bot.edit_message_text(m.from_user.id, edit.id, "File already exsist")
         return
+
+@bot.on_message(filters.command(["update", "rename"], pre))
+async def rename_f(c: bot,  m: Message):
+    if m.from_user.id != int(DEV):
+        await m.reply_text("Only dev can do this")
+        return
+    try:
+        splited = m.text.split(None,1)[1]
+    except IndexError:
+        await m.reply_text("See help to know how to use this cmd")
+        return
+    keys = splited.split("|").strip()
+    try:
+        old = keys[0]
+        new = keys[1]
+    except IndexError:
+        await m.reply_text("See help to know how to use this cmd")
+        return
+    um = await m.reply_text("Changing key name")
+    changed = USERS(m.from_user.id).renamefield(old, new)
+    await um.delete()
+    await m.reply_text(f"Done\nNumber of modified document = {changed}\nIf it is 0 then there is now such key as {old}")
+    return
+
+@bot.on_message(filters.command(["updatedb"], pre))
+async def update_db(c: bot, m: Message):
+    if m.from_user.id != int(DEV):
+        await m.reply_text("Only dev can do this")
+        return
+    try:
+        key = m.text.split(None,1)[1].strip()
+    except IndexError:
+        await m.reply_text("See help to know how to use this cmd")
+        return
+    um = await m.reply_text("Updating value")
+    users = USERS.get_all_users()
+    if not users:
+        await m.reply_text("No collection found")
+        return
+    for user in users:
+        USERS(user).new_key(key)
+    await um.delete()
+    await m.reply_text(f"Done added a new key with name {key} and value 0")
+    return
+
+@bot.on_message(filters.command(["save"], pre))
+async def temp_save(c: bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("Only owner and sudoer can do that")
+        return
+    um = await m.reply_text("Exporting users database in new collection")
+    data = USERS.get_all_users()
+    temp = TEMP()
+    for i in data:
+        temp.save_temp(
+            i["user_id"],
+            i["coin"]
+        )
+    await um.delete()
+    await m.reply_text(f"Export complete\nType /compensate to give it to all users")
+
+@bot.on_message(filters.command(["compensate"], pre))
+async def temp_give_delete(c: bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("Only owner and sudoer can do that")
+        return
+    bot_user = (await bot.get_me()).username
+    um = await m.reply_text(f"Giving all users their {COIN_NAME} {COIN_EMOJI} back")
+    to_give = TEMP().compensate()
+    for i in to_give:
+        com_link = f"**Type link before clicking. Otherwise you will not get the coins**.\n[Click Here](t.me/{bot_user}?start=compensate_{i['coin']})\n\nTo get your {COIN_NAME} {COIN_EMOJI} back\nDon't share this link with anyone else. Otherwise they will get your link and you will get nothing"
+        kb = IKM(
+            [[KB("Compensation",url=f"t.me/{bot_user}?start=compensate_{i['coin']}")]]
+        )
+        try:
+            await bot.send_message(i["user_id"], com_link, reply_markup=kb)
+        except Exception:
+            pass
+    await um.delete()
+    await m.reply_text("Done")
+        
 
 @bot.on_chat_member_updated(filters.chat(CHAT_ID))
 async def coin_increaser(c: bot, u: ChatMemberUpdated):
