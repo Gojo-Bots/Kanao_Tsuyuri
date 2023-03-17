@@ -691,7 +691,7 @@ async def message_increaser(c: bot, m: Message):
                 return
             blocked[u_id] = for_time
             return
-    except IndexError:
+    except (IndexError,KeyError):
         pass
     User = USERS(u_id)
     mess = User["message"]
@@ -708,11 +708,11 @@ async def message_increaser(c: bot, m: Message):
         sec = round(time.time())
         if not len(spam):
             spam[u_id] = [["x"],[sec]] # First one is message second one is time
-        for i in spam.keys():
-            if i != u_id:
-                spam[u_id] = [["x"],[sec]]
-            else:
-                spam[u_id][0].append("x")
-                spam[u_id][1].append(sec)
+        try:
+            spam[u_id][0].append("x")
+            spam[u_id][1].append(sec)
+        except KeyError:
+            spam[u_id] = [["x"],[sec]]
+                
         User.mess_update()
         return
