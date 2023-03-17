@@ -693,7 +693,7 @@ async def message_increaser(c: bot, m: Message):
             return
     except (IndexError,KeyError):
         pass
-    User = USERS(u_id)
+    User = USERS(u_id).get_info()
     mess = User["message"]
     link = User["link"]
     if mess >= NUMBER_MESSAGE:
