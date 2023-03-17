@@ -698,8 +698,6 @@ async def time_for():
     return bantime
 @bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
-    print(spam)
-    print(blocked)
     u_id = m.from_user.id
     if len(blocked):
         try:
@@ -755,6 +753,4 @@ async def message_increaser(c: bot, m: Message):
         except KeyError:
             spam[u_id] = [["x"],[sec]]
         USERS(u_id).mess_update()
-        print(spam)
-        print(blocked)
         return
