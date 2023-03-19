@@ -1,5 +1,6 @@
 import time
 from datetime import datetime, timedelta
+import pytz
 
 from pyrogram.enums import ChatType as CT
 from pyrogram.types import CallbackQuery
@@ -685,8 +686,7 @@ async def coin_increaser(c: bot, u: ChatMemberUpdated):
 spam = {}
 blocked = {}
 users = USERS.get_all_users()
-async def time_for():
-    initial_time = datetime.now()
+async def time_for(initial_time):
     if unit == "m":
         bantime = initial_time + timedelta(minutes=int(time_num))
     elif unit == "h":
@@ -696,16 +696,23 @@ async def time_for():
     else:
         bantime = initial_time + timedelta(hours=1)
     return bantime
+IST = pytz.timezone('Asia/Kolkata')
 @bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
     u_id = m.from_user.id
     if len(blocked):
         try:
             till = blocked[u_id]
-            if datetime.now() < till:
+            if datetime.now(IST) <= till:
                 return
-            elif datetime.now() >= till:
+            elif datetime.now(IST) > till:
                 del blocked[u_id]
+                try:
+                    await bot.send_message(u_id,"You are unblocked now. Don't do spam anymore otherwise you will be blocked again")
+                    return
+                except:
+                    await m.reply_text("You are unblocked now. Don't do spam anymore otherwise you will be blocked again\nAnd unblock the bot to enjoy features")
+                    return
         except KeyError:
             pass
     try:
@@ -713,7 +720,7 @@ async def message_increaser(c: bot, m: Message):
         y = spam[u_id][1][-1]
         if len(spam[u_id][0]) >= LIMIT:
             if y-x <= WITHIN:
-                for_time = await time_for()
+                for_time = await time_for(datetime.now(IST))
                 till_time = for_time.strftime("%H:%M:%S")
                 till_date = for_time.strftime("%d-%m-%Y")
                 await m.reply_text(f"⚠️ You further message will not considered 🚫\nReason : Due to sapm\nYou are blocked till:\n\t📅Date : {till_date}\n\t🕔Time : {till_time}")
