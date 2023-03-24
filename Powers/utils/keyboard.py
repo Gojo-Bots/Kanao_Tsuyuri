@@ -17,7 +17,6 @@ def help_kb(owner_username):
             KB("📚 Help", "menu_help")
         ],
         [
-            KB("👑 Owner", url = f"https://{owner_username}.t.me/"),
             KB("⚡️ Powered By", url = "https://gojo_bots_network.t.me")
         ],
 
