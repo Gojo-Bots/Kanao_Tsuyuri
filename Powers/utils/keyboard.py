@@ -11,7 +11,7 @@ yes_no = [[
     KB("✅ Yes", "new_yus"),
     KB("🚫 No", "new_noi")
 ]]
-def help_kb(owner_username):
+def help_kb():
     help_kb = [
         [
             KB("📚 Help", "menu_help")

@@ -18,6 +18,32 @@ async def rewards(c: bot, m: Message):
     await m.reply_text(txt, reply_markup=initial_kb())
     return
 
+@bot.on_message(filters.command("typecat",pre))
+async def list_cat_types(c:bot, m:Message):
+    Category = CATEGORY
+    for i in list(stuff.file_sorted()):
+        Category.append(i)
+    txt = f"Available categories\n{'\n'.join(Category)}"
+    await m.reply_text(txt)
+    return
+
+@bot.on_message(filters.command(["rmcat"], pre))
+async def remove_file_cat(c:bot, m: Message):
+    if m.from_user.id not in OWNER_ID:
+        await m.reply_text("You can't do that")
+        return
+    split = m.text.split()
+    if len(split) != 2:
+        await m.reply_text("**USAGE**\n/rmcat <category name>")
+        return
+    to_rm = split[1].lower()
+    x = STUFF().remove_category(to_rm)
+    if x:
+        await m.reply_text(f"Done\n{x}")
+        return
+    await m.reply_text("No category found with the given one")
+    return
+
 @bot.on_message(filters.command(["rmfile", "removefile"], pre))
 async def rem_file(c:bot , m: Message):
     if m.from_user.id not in OWNER_ID:

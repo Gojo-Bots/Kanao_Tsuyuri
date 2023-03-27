@@ -17,12 +17,16 @@ and the user joined by that link will not considered as any base to give reward 
 
 /buy : To buy stuffs. Works only in private chat
 
+/typecat : To get list of all existing categories
+
 **YOU WILL GET {COIN_MESSAGE} {COIN_NAME + " " + COIN_EMOJI} WHEN YOU SEND {NUMBER_MESSAGE} IN THE CHAT**
 
 **OWNER ONLY**
 /addfile : To add file
 
 /rmfile
+
+/rmcat <category name> : Remove the given category
 
 /addcat <name of CATEGORY should be str | pass nothing> : Add a new CATEGORY
 

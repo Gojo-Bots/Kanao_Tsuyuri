@@ -25,7 +25,7 @@
             "value" : ""
         },
         "SUDO": {
-            "description": "Sudoers id. Have same powers as owner. Seprate multiple value with space. Don't leave it blank enter your id if you don't find any sudo",
+            "description": "Sudoers id. Have same powers as owner",
             "required" : true,
             "value" : ""
         },
@@ -40,7 +40,7 @@
             "value": ""
         },
         "CATEGORY": {
-            "description": "Name of initial category your want to divide the rewards in. Seprate them by space. If you have a value which have space between them seprate them using _",
+            "description": "Name of initial category your want to divide the rewards in.",
             "required": true,
             "value": ""
         },
@@ -90,7 +90,7 @@
             "value":5
         },
         "TIME":{
-            "description": "For time the user will not get the increment in number message due to spam.Use m for minutes, h for hours and d for days. Don't give space between time and unit give it in same format given below",
+            "description": "For time the user will not get the increment in number message due to spam.",
             "required": true,
             "value": "1h"
         },

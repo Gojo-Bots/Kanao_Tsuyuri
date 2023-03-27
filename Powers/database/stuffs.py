@@ -57,6 +57,16 @@ class STUFF(MongoDB):
         else:
             return False
 
+    def remove_category(self, dtype):
+        dtype = dtype.lower()
+        curr = self.find_one({"type": dtype})
+        if curr:
+            x = self.delete_one({"type": dtype})
+            return x
+        else:
+            return False
+
+
     def get_file_link(self, id):
         name = name.lower()
         curr = self.find_one({"f_id" : id})

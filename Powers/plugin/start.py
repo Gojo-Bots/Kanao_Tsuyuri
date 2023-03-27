@@ -1,8 +1,9 @@
 import time
 from datetime import datetime, timedelta
-import pytz
 
+import pytz
 from pyrogram.enums import ChatType as CT
+from pyrogram.enums import ParseMode as PM
 from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
@@ -31,7 +32,6 @@ back_kb = IKM(
     )
 @bot.on_message(filters.command(["start"], pre))
 async def start_(c: bot, m: Message):
-    owner_user = (await bot.get_users(OWNER)).username
     if m.chat.type == CT.PRIVATE:
         if len(m.text.split()) > 1:
             option = (m.text.split(None, 1)[1]).lower()
@@ -52,22 +52,21 @@ async def start_(c: bot, m: Message):
                 return
     txt = f"Hi! {m.from_user.mention}\nDo /help to know what I can do."
     if m.chat.type == CT.PRIVATE:
-        await bot.send_message(m.chat.id, txt, reply_markup=help_kb(owner_user))
+        await bot.send_message(m.chat.id, txt, reply_markup=help_kb())
         return
     else:
-        await m.reply_text(txt,reply_markup=help_kb(owner_user))
+        await m.reply_text(txt,reply_markup=help_kb())
         return
 @bot.on_callback_query(filters.regex("^menu_"), group=-1)
 async def help_menu_back(c: bot, q: CallbackQuery):
     data = q.data.split("_")[-1]
-    owner_user = (await bot.get_users(OWNER)).username
     if data == "help":
         await q.answer("Help menu")
         await q.edit_message_text(help_txt, reply_markup=back_kb)
         return
     elif data == "back":
         await q.answer("Back")
-        await q.edit_message_text(f"Hi! {q.message.from_user.mention}\nDo /help to know what I can do.", reply_markup=help_kb(owner_user))
+        await q.edit_message_text(f"Hi! {q.message.from_user.mention}\nDo /help to know what I can do.", reply_markup=help_kb())
         return
 
 @bot.on_message(filters.command(["help"], pre))
@@ -301,21 +300,25 @@ async def forwarder(c:bot, m: Message):
     await m.reply_text(f"Successfully forwardeded the message to {len(users) - i} out of {len(users)} users")
     return
 
-async def help_broadcast(file,m_id):
+async def help_broadcast(file:Message):
     users = USERS.get_all_users()
     i = 0
+    mode = PM.MARKDOWN
+    capt = "BROADCASTED"
+    if file.media:
+        capt = file.caption
     for user in users:
         try:
             if file.text:
-                await bot.send_message(int(user), m_id)
+                await bot.send_message(int(user), file.text.markdown, parse_mode=mode)
             elif file.animation:
-                await bot.send_animation(int(user),m_id)
+                await bot.send_animation(int(user), file.animation.file_id, caption=capt, parse_mode=mode)
             elif file.photo:
-                await bot.send_photo(int(user),m_id)
+                await bot.send_photo(int(user), file.photo.file_id, caption=capt, parse_mode=mode)
             elif file.video:
-                await bot.send_video(int(user),m_id)
+                await bot.send_video(int(user), file.video.file_id, caption=capt, parse_mode=mode)
             elif file.document:
-                await bot.send_document(int(user),m_id)
+                await bot.send_document(int(user), file.document.file_id, caption=capt, parse_mode=mode)
             else:
                 i = "Unsupported file type"
                 return i , len(users)
@@ -335,9 +338,8 @@ async def broadcaster(c: bot, m: Message):
         return
     if m.reply_to_message:
         reply_to = m.reply_to_message
-        file = m.reply_to_message_id
         um = await m.reply_text("Broadcasting message...")
-        x, y = await help_broadcast(reply_to, file)
+        x, y = await help_broadcast(reply_to)
         
         await um.delete()
         if type(x) == str:
@@ -362,11 +364,10 @@ async def broadcaster(c: bot, m: Message):
             await bot.get_messages(m.chat.id,file.id+1)
         else:
             mess = await bot.get_messages(m.chat.id,file.id+1)
-        m_id = mess.id
         await z.delete()
         await file.delete()
         um = await m.reply_text("Broadcasting message...")
-        x = await help_broadcast(mess,m_id)
+        x = await help_broadcast(mess)
         await um.delete()
         if type(i) == str:
             await m.reply_text(i)
@@ -387,7 +388,6 @@ async def gift_one(c: bot, m: Message):
     if len(split) < 3 and not (len(split) == 2 and m.reply_to_message):
         await m.reply_text("Use /help to see how to use this command")
         return
-    owner = (await bot.get_users(OWNER)).mention
     if len(split) == 3:
         try:
             user = int(split[1])
@@ -403,7 +403,7 @@ async def gift_one(c: bot, m: Message):
             await m.reply_text("User is not registered in my database")
         link = User["link"]
         try:
-            await bot.send_message(user,f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI}  enjoy🎉")
+            await bot.send_message(user,f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI}  enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
@@ -420,7 +420,7 @@ async def gift_one(c: bot, m: Message):
         User = USERS(user).get_info()
         link = User["link"]
         try:
-            await bot.send_message(user,f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
+            await bot.send_message(user,f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
             USERS.update_coin(str(link), money)
             await m.reply_text(f"Successfully given {user} {money} {COIN_NAME +' '+ COIN_EMOJI}")
             return
@@ -442,27 +442,24 @@ async def gift_all(c: bot, m: Message):
     except ValueError:
         await m.reply_text("Coin should be natural number")
         return
-    users = USERS.get_all_users()
-    links = {}
+    um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +' '+ COIN_EMOJI}")
+    users = USERS.get_all_users(True)
+    l = 0
     for user in users:
         User = USERS(user).get_info()
         link = User["link"]
-        links[user] = str(link)
-    um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +' '+ COIN_EMOJI}")
-    l = 0
-    owner = (await bot.get_users(OWNER)).mention
-    try:
-        for i,j in links.items():
-            await bot.send_message(int(i), f"{owner} gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
-            USERS.update_coin(j,money)
-    except Exception:
-        l+=1
-        pass
+        i = User["user_id"]
+        try:
+            await bot.send_message(int(i), f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
+            USERS.update_coin(link,money)
+        except Exception:
+            l+=1
+            pass
     await um.delete()
-    if l == len(links):
+    if l == len(users):
         await m.reply_text("Failed to give any user gifts.")
         return
-    await m.reply_text(f"Successfully given {len(links) - l} out of {len(links)} users {money} {COIN_NAME +' '+ COIN_EMOJI}")
+    await m.reply_text(f"Successfully given {len(users) - l} out of {len(users)} users {money} {COIN_NAME +' '+ COIN_EMOJI}")
     return
 
 @bot.on_message(filters.command(["addfile"], pre) & filters.private)
