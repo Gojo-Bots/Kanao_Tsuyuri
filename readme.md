@@ -11,4 +11,4 @@
 
 
 # Powered by [ɢօʝօ ɮօȶֆ](https://github.com/Gojo-Bots)
-[![Gojo-Bots](https://avatarfiles.alphacoders.com/339/339922.jpg)](https://github.com/Gojo-Bots)
+[![Gojo-Bots](https://artfiles.alphacoders.com/160/160160.jpeg)](https://github.com/Gojo-Bots)
