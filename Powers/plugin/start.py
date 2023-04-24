@@ -444,17 +444,24 @@ async def gift_all(c: bot, m: Message):
         return
     um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +' '+ COIN_EMOJI}")
     users = USERS.get_all_users(True)
+    if not users:
+        await m.reply_text("No users found")
+        return
     l = 0
     for user in users:
         User = USERS(user).get_info()
-        link = User["link"]
-        i = User["user_id"]
-        try:
-            await bot.send_message(int(i), f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
-            USERS.update_coin(link,money)
-        except Exception:
+        if not User:
             l+=1
-            pass
+            continue
+        if User:
+            link = User["link"]
+            i = User["user_id"]
+            try:
+                await bot.send_message(int(i), f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
+                USERS.update_coin(link,money)
+            except Exception:
+                l+=1
+                pass
     await um.delete()
     if l == len(users):
         await m.reply_text("Failed to give any user gifts.")
