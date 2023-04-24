@@ -23,7 +23,9 @@ async def list_cat_types(c:bot, m:Message):
     Category = CATEGORY
     for i in list(stuff.file_sorted()):
         Category.append(i)
-    txt = f"Available categories\n{'\n'.join(Category)}"
+    catss = ""
+    catss += '\n'.join(Category)
+    txt = f"Available categories\n{catss}"
     await m.reply_text(txt)
     return
 
@@ -34,7 +36,7 @@ async def remove_file_cat(c:bot, m: Message):
         return
     split = m.text.split()
     if len(split) != 2:
-        await m.reply_text("**USAGE**\n/rmcat <category name>")
+        await m.reply_text("**USAGE**\n/rmcat [category name]")
         return
     to_rm = split[1].lower()
     x = STUFF().remove_category(to_rm)
