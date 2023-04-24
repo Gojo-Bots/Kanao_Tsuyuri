@@ -443,7 +443,7 @@ async def gift_all(c: bot, m: Message):
         await m.reply_text("Coin should be natural number")
         return
     um = await m.reply_text(f"Trying to give all users {money} {COIN_NAME +' '+ COIN_EMOJI}")
-    users = USERS.get_all_users(True)
+    users = USERS.get_all_users()
     if not users:
         await m.reply_text("No users found")
         return
