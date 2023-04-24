@@ -452,8 +452,8 @@ async def gift_all(c: bot, m: Message):
         User = USERS(user).get_info()
         if not User:
             l+=1
-            continue
-        if User:
+            pass
+        elif User:
             link = User["link"]
             i = User["user_id"]
             try:
