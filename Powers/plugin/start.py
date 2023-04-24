@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 from pyrogram.enums import ChatType as CT
 from pyrogram.enums import ParseMode as PM
+from pyrogram.errors import UserIsBlocked
 from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup as IKM
 
@@ -75,6 +76,9 @@ async def help_(c: bot, m: Message):
     return
 @bot.on_message(filters.command(["addowner"], pre))
 async def owner_add(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -97,6 +101,9 @@ async def owner_add(c: bot, m: Message):
     return
 @bot.on_message(filters.command(["rmowner"], pre))
 async def owner_rm(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER:
         await m.reply_text("You can't do that")
         return
@@ -134,6 +141,9 @@ async def owners_info(c: bot, m: Message):
 
 @bot.on_message(filters.command(["links", "link"], pre) & ~filters.bot & (filters.chat(CHAT_ID) | filters.private))
 async def link_(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     is_user = USERS.is_user(m.from_user.id)
     if not is_user:
         try:
@@ -193,6 +203,9 @@ async def new_linkkk(c: bot, q: CallbackQuery):
 
 @bot.on_message(filters.command(["mylink"], pre))
 async def u_link(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     User = USERS(m.from_user.id)
     link = User.get_link()
     if link:
@@ -203,6 +216,9 @@ async def u_link(c: bot, m: Message):
 
 @bot.on_message(filters.command(["profile", "myprofile"], pre))
 async def u_info(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if not m.reply_to_message:
         split = m.text.split(None, 1)
         if len(split) == 1:
@@ -220,7 +236,12 @@ async def u_info(c: bot, m: Message):
                         await m.reply_text("Unable to find user.")
                         return
     elif m.reply_to_message:
-        user = m.reply_to_message.from_user.id
+        xXx = m.reply_to_message.from_user
+        if xXx:
+            user = xXx.id
+        else:
+            await m.reply_text("This is not an user I guess...")
+            return
     User = USERS(user).get_info()
     if User:
         u_id = User["user_id"]
@@ -243,6 +264,8 @@ Here is the info of the user:
 
 @bot.on_message(filters.command(["addcat"], pre) & filters.private)
 async def cat_adder(c:bot, m:Message):
+    if not m.from_user:
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -278,6 +301,8 @@ async def cat_adder(c:bot, m:Message):
 
 @bot.on_message(filters.command(['forward'], pre))
 async def forwarder(c:bot, m: Message):
+    if not m.from_user:
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -322,14 +347,15 @@ async def help_broadcast(file:Message):
             else:
                 i = "Unsupported file type"
                 return i , len(users)
-        except Exception as e:
+        except UserIsBlocked:
             i += 1
-            await bot.send_message(DEV, f"Error in broadcasting\n{e}")
             pass
     return i, len(users)
 
 @bot.on_message(filters.command(["broadcast"], pre))
 async def broadcaster(c: bot, m: Message):
+    if not m.from_user:
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -376,11 +402,13 @@ async def broadcaster(c: bot, m: Message):
         if not suc:
             await m.reply_text("Failed to broadcast the message.")
             return
-        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users")
+        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users\n`{int(y)-int(suc)}` users have blocked you")
         return
        
 @bot.on_message(filters.command(["gift"], pre))
 async def gift_one(c: bot, m: Message):
+    if not m.from_user:
+        return
     if m.from_user.id != OWNER:
         await m.reply_text("Only owner can do it")
         return
@@ -411,6 +439,9 @@ async def gift_one(c: bot, m: Message):
             await m.reply_text("Tell the user to start the bot first")
             return
     if len(split) == 2:
+        if not m.reply_to_message.from_user:
+            await m.reply_text("This is not an user I guess")
+            return
         user = m.reply_to_message.from_user.id
         money = split[1]
         try:
@@ -430,6 +461,9 @@ async def gift_one(c: bot, m: Message):
 
 @bot.on_message(filters.command(["giftall"], pre))
 async def gift_all(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id != OWNER:
         await m.reply_text("Only owner can do it")
         return
@@ -459,7 +493,7 @@ async def gift_all(c: bot, m: Message):
             try:
                 await bot.send_message(int(i), f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
                 USERS.update_coin(link,money)
-            except Exception:
+            except UserIsBlocked:
                 l+=1
                 pass
     await um.delete()
@@ -471,6 +505,9 @@ async def gift_all(c: bot, m: Message):
 
 @bot.on_message(filters.command(["addfile"], pre) & filters.private)
 async def file_adder(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -585,6 +622,9 @@ async def file_adder(c: bot, m: Message):
 
 @bot.on_message(filters.command(["update", "rename"], pre))
 async def rename_f(c: bot,  m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id != int(DEV):
         await m.reply_text("Only dev can do this")
         return
@@ -608,6 +648,9 @@ async def rename_f(c: bot,  m: Message):
 
 @bot.on_message(filters.command(["updatedb"], pre))
 async def update_db(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id != int(DEV):
         await m.reply_text("Only dev can do this")
         return
@@ -629,6 +672,9 @@ async def update_db(c: bot, m: Message):
 
 @bot.on_message(filters.command(["save"], pre))
 async def temp_save(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("Only owner and sudoer can do that")
         return
@@ -645,6 +691,9 @@ async def temp_save(c: bot, m: Message):
 
 @bot.on_message(filters.command(["compensate"], pre))
 async def temp_give_delete(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("Only owner and sudoer can do that")
         return
@@ -703,6 +752,8 @@ async def time_for(initial_time):
 IST = pytz.timezone('Asia/Kolkata')
 @bot.on_message(~filters.bot & filters.user(users) & ~filters.private)
 async def message_increaser(c: bot, m: Message):
+    if not m.from_user:
+        return
     u_id = m.from_user.id
     if len(blocked):
         try:

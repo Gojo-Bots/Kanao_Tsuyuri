@@ -14,12 +14,18 @@ from Powers.utils.keyboard import *
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
 async def rewards(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     txt = "What you want to buy"
     await m.reply_text(txt, reply_markup=initial_kb())
     return
 
 @bot.on_message(filters.command("typecat",pre))
 async def list_cat_types(c:bot, m:Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     Category = CATEGORY
     for i in list(stuff.file_sorted()):
         Category.append(i)
@@ -31,6 +37,9 @@ async def list_cat_types(c:bot, m:Message):
 
 @bot.on_message(filters.command(["rmcat"], pre))
 async def remove_file_cat(c:bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("You can't do that")
         return
@@ -48,6 +57,9 @@ async def remove_file_cat(c:bot, m: Message):
 
 @bot.on_message(filters.command(["rmfile", "removefile"], pre))
 async def rem_file(c:bot , m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if m.from_user.id not in OWNER_ID:
         await m.reply_text("Owner and sudoer command!")
         return
@@ -228,6 +240,9 @@ async def initial_call(c: bot, q: CallbackQuery):
 
 @bot.on_message(filters.command(["premium"], pre) & filters.private) 
 async def premium_channel(c: bot, m: Message):
+    if not m.from_user:
+        await m.reply_text("Not an user")
+        return
     if not PREMIUM_CHANNEL:
         await m.reply_text("Premium channel is not available.")
         return
