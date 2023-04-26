@@ -216,16 +216,18 @@ async def initial_call(c: bot, q: CallbackQuery):
             )"""
             await q.edit_message_reply_markup(IKM(purchased_kb(data)))
             try:
+                c_id = q.message.chat.id
+                await q.message.delete()
                 if s_type == "document":
-                    await q.message.reply_document(s_file, caption="Here is your delivery")
+                    await bot.send_document(c_id,s_file,caption="Here is your delivery",protect_content=True)
                 elif s_type == "video":
-                    await q.message.reply_video(s_file, caption="Here is your delivery")
+                    await bot.send_video(c_id,s_file,caption="Here is your delivery",protect_content=True)
                 elif s_type == "photo":
-                    await q.message.reply_photo(s_file, caption="Here is your delivery")
+                    await bot.send_photo(c_id,s_file,caption="Here is your delivery",protect_content=True)
                 elif s_type == "video_note":
-                    await q.message.reply_video_note(s_file, caption="Here is your delivery")
+                    await bot.send_video_note(c_id,s_file,caption="Here is your delivery",protect_content=True)
                 elif s_type == "animation":
-                    await q.message.reply_animation(s_file, caption="Here is your delivery")
+                    await bot.send_animation(c_id,s_file,caption="Here is your delivery",protect_content=True)
                     USERS.update_coin(u_link, deduct=True)
                 await q.answer("Successfully pruchased")
                 USERS.update_coin(str(u_link), int(s_coin), True)
