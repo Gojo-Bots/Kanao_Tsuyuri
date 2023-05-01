@@ -349,7 +349,7 @@ async def help_broadcast(file:Message):
             elif file.animation:
                 await bot.send_animation(int(user), file.animation.file_id, caption=capt, parse_mode=mode)
             elif file.photo:
-                await bot.send_photo(int(user), file.photo.file_id, caption=capt, parse_mode=mode)
+                await bot.send_photo(int(user), file.phfoto.file_id, caption=capt, parse_mode=mode)
             elif file.video:
                 await bot.send_video(int(user), file.video.file_id, caption=capt, parse_mode=mode)
             elif file.document:
@@ -686,9 +686,9 @@ async def set_user_coins_val(c: bot, m: Message):
         await m.reply_text("User is not registered in my database")
     f_mon = User["coin"]
     try:
-        await bot.send_message(user,f"Owner of the bot set your {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 💀")
+        await bot.send_message(user,f"Owner changed value {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 💀")
         USERS(user).set_users_coin(int(money))
-        await m.reply_text(f"Successfully given {user} {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 🗿")
+        await m.reply_text(f"Successfully changed value of {user}'s {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 🗿")
         return
     except Exception:
         await m.reply_text("Tell the user to start the bot first")
@@ -707,7 +707,7 @@ async def le_le_bhikhari(c: bot, m: Message):
             await m.reply_text("This is not an user I guess")
             return
         user = m.reply_to_message.from_user.id
-        money = abs(split[1])
+        money = abs(int(split[1]))
     from_u = m.from_user.id
     User = USERS(user).get_info()
     if not User:

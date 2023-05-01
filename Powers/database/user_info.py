@@ -136,6 +136,8 @@ class USERS(MongoDB):
                     {"user_id":self.user_id},
                     {"coin" : amount}
                 )
+                return
+            return
     @staticmethod
     def update_coin(link: str , amount:int ,deduct: bool = False):
         coin = USERS.get_coin_by_link(link)
