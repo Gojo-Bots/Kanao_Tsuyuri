@@ -128,7 +128,14 @@ class USERS(MongoDB):
                 {"user_id" : self.user_id},
                 {"link" : link}
             )
-    
+    def set_users_coin(self, amount:int):
+        with INSERTION_LOCK:
+            curr = self.find_one(self.user_id)
+            if curr:
+                self.update(
+                    {"user_id":self.user_id},
+                    {"coin" : amount}
+                )
     @staticmethod
     def update_coin(link: str , amount:int ,deduct: bool = False):
         coin = USERS.get_coin_by_link(link)
@@ -152,3 +159,11 @@ class USERS(MongoDB):
                 {"link" : link},
                 {"joined" : int(joined)}
                 )
+    def delete_user(self):
+        with INSERTION_LOCK:
+            curr = self.find_one(self.user_id)
+            if curr:
+                self.delete_one(self.user_id)
+                return
+            else:
+                return

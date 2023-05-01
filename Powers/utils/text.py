@@ -19,6 +19,8 @@ and the user joined by that link will not considered as any base to give reward 
 
 /typecat : To get list of all existing categories
 
+/donate <reply to user> <amount> : Give the given amount to the user which is replied to. Taxes are set to 25%
+
 **YOU WILL GET {COIN_MESSAGE} {COIN_NAME + " " + COIN_EMOJI} WHEN YOU SEND {NUMBER_MESSAGE} IN THE CHAT**
 
 **OWNER ONLY**
@@ -43,6 +45,8 @@ and the user joined by that link will not considered as any base to give reward 
 /giftall <amount> : Give coin to all current users
 
 /save : Save all the collection in a temp collection
+
+/setvalue <user_id | reply to user> <amount> : To set value of user
 
 /compensate : Give the coins to all the users saved in temp collection
 

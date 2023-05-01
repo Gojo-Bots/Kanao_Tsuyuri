@@ -2,6 +2,7 @@ import time
 from datetime import datetime, timedelta
 
 import pytz
+from pyrogram.enums import ChatMemberStatus as CMS
 from pyrogram.enums import ChatType as CT
 from pyrogram.enums import ParseMode as PM
 from pyrogram.errors import UserIsBlocked
@@ -239,6 +240,8 @@ async def u_info(c: bot, m: Message):
         xXx = m.reply_to_message.from_user
         if xXx:
             user = xXx.id
+        elif m.reply_to_message.sender_chat:
+            user = m.from_user.id
         else:
             await m.reply_text("This is not an user I guess...")
             return
@@ -311,23 +314,30 @@ async def forwarder(c:bot, m: Message):
         return
     users = USERS.get_all_users()
     i = 0
+    rem = 0
     um = await m.reply_text("Forwarding the message")
     for user in users:
         try:
             await bot.forward_messages(int(user), m.chat.id, m.reply_to_message_id)
         except Exception:
             i += 1
+            try:
+                USERS(user).delete_user()
+                rem += 1
+            except Exception:
+                pass
             pass
     
     await um.delete()
     if i == len(users):
         await m.reply_text("Failed to forward message")
-    await m.reply_text(f"Successfully forwardeded the message to {len(users) - i} out of {len(users)} users")
+    await m.reply_text(f"Successfully forwardeded the message to {len(users) - i} out of {len(users)} users\nRemoved those user who have blocked me from my database\nRemoved user: {rem}")
     return
 
 async def help_broadcast(file:Message):
     users = USERS.get_all_users()
     i = 0
+    rem = 0
     mode = PM.MARKDOWN
     capt = "BROADCASTED"
     if file.media:
@@ -347,10 +357,15 @@ async def help_broadcast(file:Message):
             else:
                 i = "Unsupported file type"
                 return i , len(users)
-        except UserIsBlocked:
+        except Exception:
             i += 1
+            try:
+                USERS(int(user)).delete_one()
+                rem += 1
+            except Exception:
+                pass
             pass
-    return i, len(users)
+    return i, len(users), rem
 
 @bot.on_message(filters.command(["broadcast"], pre))
 async def broadcaster(c: bot, m: Message):
@@ -365,7 +380,7 @@ async def broadcaster(c: bot, m: Message):
     if m.reply_to_message:
         reply_to = m.reply_to_message
         um = await m.reply_text("Broadcasting message...")
-        x, y = await help_broadcast(reply_to)
+        x, y, z = await help_broadcast(reply_to)
         
         await um.delete()
         if type(x) == str:
@@ -402,7 +417,7 @@ async def broadcaster(c: bot, m: Message):
         if not suc:
             await m.reply_text("Failed to broadcast the message.")
             return
-        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users\n`{int(y)-int(suc)}` users have blocked you")
+        await m.reply_text(f"Successfully broadcasted message to {suc} users out of {y} users\n`{int(y)-int(suc)}` users have blocked you\nRemoved those user who have blocked me from my database\nRemoved user: {z}")
         return
        
 @bot.on_message(filters.command(["gift"], pre))
@@ -482,6 +497,7 @@ async def gift_all(c: bot, m: Message):
         await m.reply_text("No users found")
         return
     l = 0
+    rem = 0
     for user in users:
         User = USERS(user).get_info()
         if not User:
@@ -493,14 +509,19 @@ async def gift_all(c: bot, m: Message):
             try:
                 await bot.send_message(int(i), f"Owner of the bot gave you {money} {COIN_NAME +' '+ COIN_EMOJI} enjoy🎉")
                 USERS.update_coin(link,money)
-            except UserIsBlocked:
+            except Exception:
                 l+=1
+                try:
+                    USERS(user).delete_user()
+                    rem += 1
+                except Exception:
+                    pass
                 pass
     await um.delete()
     if l == len(users):
         await m.reply_text("Failed to give any user gifts.")
         return
-    await m.reply_text(f"Successfully given {len(users) - l} out of {len(users)} users {money} {COIN_NAME +' '+ COIN_EMOJI}")
+    await m.reply_text(f"Successfully given {len(users) - l} out of {len(users)} users {money} {COIN_NAME +' '+ COIN_EMOJI}\nRemoved those user who have blocked me from my database\nRemoved user: {rem}")
     return
 
 @bot.on_message(filters.command(["addfile"], pre) & filters.private)
@@ -523,7 +544,7 @@ async def file_adder(c: bot, m: Message):
     f_name = str(ff_name.text.lower())
     await bot.send_message(m.from_user.id, "File name received")
     ff_link = await bot.ask(
-        text = "Send me the file\nType /cancel to abort the operation",
+        text = "Send me the file\nIf you want to create a join link when user clicks on this file send me the chat id\nType /cancel to abort the operation",
         chat_id = m.from_user.id
         )
     if is_cancel(ff_link.text):
@@ -548,10 +569,23 @@ async def file_adder(c: bot, m: Message):
     elif file.video_note:
         file_id = file.video_note.file_id
         file_type = "video_note"
+    elif file.text:
+        try:
+            file_id = int(file.text)
+            chats = await bot.get_chat(file_id)
+            go_st = await bot.get_chat_member(chats.id, (await bot.get_me()).id)
+            if go_st in [CMS.ADMINISTRATOR or CMS.OWNER]:
+                file_type = "link"
+            else:
+                file_id = file.text.markdown
+                file_type = "text"
+        except Exception:
+            file_id = file.text.markdown
+            file_type = "text"
     else:
         x = await x.edit_text("Unsupported file type provided")
         return
-    x = await x.edit_text("File id received")
+    x = await x.edit_text(f"{'File id received' if not file.text else 'Text received'}")
     while True:
         ff_coin = await bot.ask(
             text = "Send me the amount of the file you want to set\nType /cancel to abort the operation",
@@ -620,6 +654,117 @@ async def file_adder(c: bot, m: Message):
         await bot.edit_message_text(m.from_user.id, edit.id, "File already exsist")
         return
 
+@bot.on_message(filters.command(["setvalue","setval"]))
+async def set_user_coins_val(c: bot, m: Message):
+    if not m.from_user:
+        return
+    if m.from_user.id != OWNER:
+        await m.reply_text("Only owner can do it")
+        return
+    split = m.text.split(None)
+    if len(split) < 3 and not (len(split) == 2 and m.reply_to_message):
+        await m.reply_text("Use /help to see how to use this command")
+        return
+    if len(split) == 3:
+        try:
+            user = int(split[1])
+        except ValueError:
+            await m.reply_text("Must pass user id")
+            return
+        try:
+            money = int(split[2])
+        except ValueError:
+            await m.reply_text("Coin should be natural number")
+    elif len(split) == 2:
+        if not m.reply_to_message.from_user:
+            await m.reply_text("This is not an user I guess")
+            return
+        user = m.reply_to_message.from_user.id
+        money = split[1]
+    User = USERS(user).get_info()
+    if not User:
+        await m.reply_text("User is not registered in my database")
+    f_mon = User["coin"]
+    try:
+        await bot.send_message(user,f"Owner of the bot set your {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 💀")
+        USERS(user).set_users_coin(int(money))
+        await m.reply_text(f"Successfully given {user} {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 🗿")
+        return
+    except Exception:
+        await m.reply_text("Tell the user to start the bot first")
+        return
+    
+@bot.on_message(filters.command("donate"))
+async def le_le_bhikhari(c: bot, m: Message):
+    if not m.from_user:
+        return
+    split = m.command
+    if len(split) != 2:
+        await m.reply_text("Use /help to see how to use this command")
+        return
+    elif len(split) == 2:
+        if not m.reply_to_message.from_user:
+            await m.reply_text("This is not an user I guess")
+            return
+        user = m.reply_to_message.from_user.id
+        money = abs(split[1])
+    from_u = m.from_user.id
+    User = USERS(user).get_info()
+    if not User:
+        await m.reply_text("User is not registered in my database")
+        return
+    FROM_IN = USERS(from_u).get_info()
+    if not FROM_IN:
+        await m.reply_text("You are not registered in my database")
+        return
+    FROM_COIN = FROM_IN["coin"]
+    USER_COIN = User["coing"]
+    if FROM_COIN < money:
+        await m.reply_text(f"You don't have this much {COIN_NAME +' '+ COIN_EMOJI}")
+        return
+    kb = IKM(
+        [
+            [
+                KB("Yes",f"don_{from_u}_{money}_{user}"),
+                KB("No","don_nooo")
+            ]
+        ]
+    )
+    gettt = money * 0.25
+    txt = f"""Are you sure to donate the user {money} {COIN_NAME +' '+ COIN_EMOJI}
+Before donation:
+    You have : {FROM_COIN} {COIN_NAME +' '+ COIN_EMOJI}
+    The user have: {USER_COIN} {COIN_NAME +' '+ COIN_EMOJI}
+
+After donation:
+    He/she will get: {gettt} {COIN_NAME +' '+ COIN_EMOJI}
+    He/she will have : {gettt + USER_COIN} {COIN_NAME +' '+ COIN_EMOJI}
+    You will have: {FROM_COIN - money} {COIN_NAME +' '+ COIN_EMOJI}
+    
+"""
+    await m.reply_text(txt,reply_markup=kb)
+    
+@bot.on_callback_query(filters.regex("^don_"),69)
+async def donation_dedo(c: bot, q: CallbackQuery):
+    spli = q.data.split()
+    if len(spli) == 2:
+        await q.answer("Cancelled")
+        await q.edit_message_text("Status:\nCancelled",reply_markup=IKM([[KB("Close","close")]]))
+        return
+    elif len(spli) == 4:
+        from_u = int(spli[1])
+        money = int(spli[2])
+        user = int(spli[3])
+        FROM_IN = USERS(from_u).get_info()
+        from_l = FROM_IN["link"]
+        GIVE = USERS(user).get_info()
+        give_l = GIVE["link"]
+        USERS.update_coin(str(from_l), money, True)
+        net_worth = money * 0.25
+        USERS.update_coin(str(give_l), net_worth)
+        await q.answer("DONE ✅")
+        await q.edit_message_text("Status:\nComplete",reply_markup=IKM([[KB("Close","close")]]))
+        return
 @bot.on_message(filters.command(["update", "rename"], pre))
 async def rename_f(c: bot,  m: Message):
     if not m.from_user:

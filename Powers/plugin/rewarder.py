@@ -1,4 +1,5 @@
 from pyrogram.enums import ChatType as CT
+from pyrogram.enums import ParseMode as PM
 from pyrogram.types import CallbackQuery, InlineKeyboardButton
 
 """from pyrogram.raw.functions.account import SetPrivacy
@@ -178,7 +179,7 @@ async def after_rm_back(c:bot, q: CallbackQuery):
             await q.message.reply_text(f"Failed to change the menu due to\n{e}")
 
             return
-@bot.on_callback_query(filters.regex("^want_") | filters.regex("^rmwant_"),group=4)
+@bot.on_callback_query(filters.regex("^want_") | filters.regex("^rmwant_"),group=5)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
@@ -229,6 +230,12 @@ async def initial_call(c: bot, q: CallbackQuery):
                 elif s_type == "animation":
                     await bot.send_animation(c_id,s_file,caption="Here is your delivery",protect_content=True)
                     USERS.update_coin(u_link, deduct=True)
+                elif s_type == "text":
+                    await bot.send_message(c_id,s_file,protect_content=True,disable_web_page_preview=True,parse_mode=PM.MARKDOWN)
+                    USERS.update_coin(u_link, deduct=True)
+                elif s_type == "link":
+                    invite = await bot.create_chat_invite_link(int(s_file),member_limit=1)
+                    await bot.send_message(c_id,invite.invite_link,protect_content=True)
                 await q.answer("Successfully pruchased")
                 USERS.update_coin(str(u_link), int(s_coin), True)
                 return
