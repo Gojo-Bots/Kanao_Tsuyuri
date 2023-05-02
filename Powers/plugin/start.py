@@ -711,7 +711,14 @@ async def le_le_bhikhari(c: bot, m: Message):
             await m.reply_text("This is not an user I guess")
             return
         user = m.reply_to_message.from_user.id
-        money = abs(int(split[1]))
+        money = int(split[1])
+    elif len(split) == 3:
+        try:
+            user = int(split[1])
+        except ValueError:
+            await m.reply_text("Pass user's id")
+            return
+        money = int(split[2])
     from_u = m.from_user.id
     User = USERS(user).get_info()
     if not User:
@@ -730,7 +737,7 @@ async def le_le_bhikhari(c: bot, m: Message):
         [
             [
                 KB("Yes",f"donate_{from_u}_{money}_{user}"),
-                KB("No","donate_nooo")
+                KB("No",f"donate_nooo_{from_u}")
             ]
         ]
     )
@@ -749,15 +756,21 @@ Note that the tax is 25% of transfering money i.e. it will be deducted from the 
 """
     await m.reply_text(txt,reply_markup=kb)
     
-@bot.on_callback_query(filters.regex("^donate_"),18)
+@bot.on_callback_query(filters.regex("^donate_(.*)$"),18)
 async def donation_dedo(c: bot, q: CallbackQuery):
     spli = q.data.split()
-    if len(spli) == 2:
+    if len(spli) == 3:
+        if q.from_user.id != int(spli[2]):
+            await q.answer("Not for you")
+            return
         await q.answer("Cancelled")
         await q.edit_message_text("Status:\nCancelled",reply_markup=IKM([[KB("Close","close")]]))
         return
     elif len(spli) == 4:
         from_u = int(spli[1])
+        if q.from_user.id != from_u:
+            await q.answer("Not for you")
+            return
         money = int(spli[2])
         user = int(spli[3])
         FROM_IN = USERS(from_u).get_info()
@@ -765,7 +778,7 @@ async def donation_dedo(c: bot, q: CallbackQuery):
         GIVE = USERS(user).get_info()
         give_l = GIVE["link"]
         USERS.update_coin(str(from_l), money, True)
-        net_worth = money * 0.75
+        net_worth = round(money * 0.75)
         USERS.update_coin(str(give_l), net_worth)
         await q.answer("DONE ✅")
         await q.edit_message_text("Status:\nComplete",reply_markup=IKM([[KB("Close","close")]]))
