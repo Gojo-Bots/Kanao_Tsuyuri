@@ -752,7 +752,7 @@ Note that the tax is 25% of transfering money i.e. it will be deducted from the 
 @bot.on_callback_query(filters.regex("^donate_"),18)
 async def donation_dedo(c: bot, q: CallbackQuery):
     spli = q.data.split()
-    if len(spli) == 3:
+    if len(spli) == 2:
         await q.answer("Cancelled")
         await q.edit_message_text("Status:\nCancelled",reply_markup=IKM([[KB("Close","close")]]))
         return
