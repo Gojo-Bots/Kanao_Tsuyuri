@@ -729,12 +729,12 @@ async def le_le_bhikhari(c: bot, m: Message):
     kb = IKM(
         [
             [
-                KB("Yes",f"don_{from_u}_{money}_{user}"),
-                KB("No","don_nooo")
+                KB("Yes",f"donate_{from_u}_{money}_{user}"),
+                KB("No","donate_nooo")
             ]
         ]
     )
-    gettt = money * 0.25
+    gettt = money * 0.75
     txt = f"""Are you sure to donate the user {money} {COIN_NAME +' '+ COIN_EMOJI}
 Before donation:
     You have : {FROM_COIN} {COIN_NAME +' '+ COIN_EMOJI}
@@ -749,10 +749,10 @@ Note that the tax is 25% of transfering money i.e. it will be deducted from the 
 """
     await m.reply_text(txt,reply_markup=kb)
     
-@bot.on_callback_query(filters.regex("^don_"),69)
+@bot.on_callback_query(filters.regex("^donate_"),18)
 async def donation_dedo(c: bot, q: CallbackQuery):
     spli = q.data.split()
-    if len(spli) == 2:
+    if len(spli) == 3:
         await q.answer("Cancelled")
         await q.edit_message_text("Status:\nCancelled",reply_markup=IKM([[KB("Close","close")]]))
         return
@@ -765,7 +765,7 @@ async def donation_dedo(c: bot, q: CallbackQuery):
         GIVE = USERS(user).get_info()
         give_l = GIVE["link"]
         USERS.update_coin(str(from_l), money, True)
-        net_worth = money * 0.25
+        net_worth = money * 0.75
         USERS.update_coin(str(give_l), net_worth)
         await q.answer("DONE ✅")
         await q.edit_message_text("Status:\nComplete",reply_markup=IKM([[KB("Close","close")]]))
