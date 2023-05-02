@@ -19,8 +19,8 @@ from Powers.utils.text import help_txt
 
 info_dict = {}
 
-DEV_s = SUDO.append(OWNER)
-DEV_LEVEL = DEV_s.append(DEV)
+
+DEV_LEVEL = SUDO + [OWNER] + [DEV]
 
 def is_cancel(msg):
     if str(msg).lower() == "/cancel":
