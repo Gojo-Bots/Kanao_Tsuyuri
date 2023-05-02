@@ -19,6 +19,8 @@ from Powers.utils.text import help_txt
 
 info_dict = {}
 
+DEV_LEVEL = SUDO + list(OWNER) + list(DEV)
+
 def is_cancel(msg):
     if str(msg).lower() == "/cancel":
         return True
@@ -80,7 +82,7 @@ async def owner_add(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     if m.reply_to_message:
@@ -97,7 +99,7 @@ async def owner_add(c: bot, m: Message):
     except Exception:
         await m.reply_text("Tell him to start the bot first")
         return
-    OWNER_ID.append(user)
+    DEV_LEVEL.append(user)
     await m.reply_text(f"Added user id `{user}` to owner's list")
     return
 @bot.on_message(filters.command(["rmowner"], pre))
@@ -105,7 +107,7 @@ async def owner_rm(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     if m.reply_to_message:
@@ -117,15 +119,15 @@ async def owner_rm(c: bot, m: Message):
         except ValueError:
             await m.reply_text("Give me id which is an integer type data")
             return
-    for i in OWNER_ID:
+    for i in DEV_LEVEL:
         if user == i:
-            OWNER_ID.remove(i)
+            DEV_LEVEL.remove(i)
     await m.reply_text("Removed the user")
 
 @bot.on_message(filters.command(["owners"], pre))
 async def owners_info(c: bot, m: Message):
     try:
-        infos = await bot.get_users(OWNER_ID)
+        infos = await bot.get_users(DEV_LEVEL)
     except Exception as e:
         await m.reply_text(f"Failed to get info of owners due to\n{e}")
         return
@@ -269,7 +271,7 @@ Here is the info of the user:
 async def cat_adder(c:bot, m:Message):
     if not m.from_user:
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     Category = CATEGORY
@@ -306,7 +308,7 @@ async def cat_adder(c:bot, m:Message):
 async def forwarder(c:bot, m: Message):
     if not m.from_user:
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     if not m.reply_to_message:
@@ -371,7 +373,7 @@ async def help_broadcast(file:Message):
 async def broadcaster(c: bot, m: Message):
     if not m.from_user:
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     if m.chat.type != CT.PRIVATE:
@@ -424,7 +426,7 @@ async def broadcaster(c: bot, m: Message):
 async def gift_one(c: bot, m: Message):
     if not m.from_user:
         return
-    if m.from_user.id != OWNER:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Only owner can do it")
         return
     split = m.text.split(None)
@@ -479,7 +481,7 @@ async def gift_all(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id != OWNER:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Only owner can do it")
         return
     split = m.text.split(None)
@@ -529,7 +531,7 @@ async def file_adder(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     Stuff = STUFF()
@@ -658,7 +660,7 @@ async def file_adder(c: bot, m: Message):
 async def set_user_coins_val(c: bot, m: Message):
     if not m.from_user:
         return
-    if m.from_user.id != OWNER:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Only owner can do it")
         return
     split = m.text.split(None)
@@ -680,10 +682,11 @@ async def set_user_coins_val(c: bot, m: Message):
             await m.reply_text("This is not an user I guess")
             return
         user = m.reply_to_message.from_user.id
-        money = split[1]
+        money = int(split[1])
     User = USERS(user).get_info()
     if not User:
         await m.reply_text("User is not registered in my database")
+        return
     f_mon = User["coin"]
     try:
         await bot.send_message(user,f"Owner changed value {COIN_NAME +' '+ COIN_EMOJI} from {f_mon} to {money} 💀")
@@ -718,7 +721,7 @@ async def le_le_bhikhari(c: bot, m: Message):
         await m.reply_text("You are not registered in my database")
         return
     FROM_COIN = FROM_IN["coin"]
-    USER_COIN = User["coing"]
+    USER_COIN = User["coin"]
     if FROM_COIN < money:
         await m.reply_text(f"You don't have this much {COIN_NAME +' '+ COIN_EMOJI}")
         return
@@ -740,7 +743,8 @@ After donation:
     He/she will get: {gettt} {COIN_NAME +' '+ COIN_EMOJI}
     He/she will have : {gettt + USER_COIN} {COIN_NAME +' '+ COIN_EMOJI}
     You will have: {FROM_COIN - money} {COIN_NAME +' '+ COIN_EMOJI}
-    
+
+Note that the tax is 25% of transfering money i.e. it will be deducted from the money you are giving.
 """
     await m.reply_text(txt,reply_markup=kb)
     
@@ -820,7 +824,7 @@ async def temp_save(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Only owner and sudoer can do that")
         return
     um = await m.reply_text("Exporting users database in new collection")
@@ -839,7 +843,7 @@ async def temp_give_delete(c: bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Only owner and sudoer can do that")
         return
     bot_user = (await bot.get_me()).username

@@ -16,9 +16,6 @@ DB_NAME = getenv("DB_NAME")
 OWNER = int(getenv("OWNER_ID"))
 DEV = int(getenv("DEV", 1344569458))
 SUDO = list({int(i) for i in getenv("SUDO")})
-OWNER_ID = []
-OWNER_ID.append(OWNER)               
-OWNER_ID.extend(SUDO)
 C = getenv("CATEGORY").split(None) # Don't remove this line
 x = []
 for i in C:

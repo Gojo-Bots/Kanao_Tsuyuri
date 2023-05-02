@@ -12,6 +12,7 @@ from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
 
+DEV_LEVEL = SUDO + list(OWNER) + list(DEV)
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
 async def rewards(c: bot, m: Message):
@@ -41,7 +42,7 @@ async def remove_file_cat(c:bot, m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("You can't do that")
         return
     split = m.text.split()
@@ -61,7 +62,7 @@ async def rem_file(c:bot , m: Message):
     if not m.from_user:
         await m.reply_text("Not an user")
         return
-    if m.from_user.id not in OWNER_ID:
+    if m.from_user.id not in DEV_LEVEL:
         await m.reply_text("Owner and sudoer command!")
         return
     txt = "What you want to remove"
