@@ -741,7 +741,7 @@ async def le_le_bhikhari(c: bot, m: Message):
             ]
         ]
     )
-    gettt = money * 0.75
+    gettt = round(money * 0.75)
     txt = f"""Are you sure to donate the user {money} {COIN_NAME +' '+ COIN_EMOJI}
 Before donation:
     You have : {FROM_COIN} {COIN_NAME +' '+ COIN_EMOJI}
@@ -756,7 +756,7 @@ Note that the tax is 25% of transfering money i.e. it will be deducted from the 
 """
     await m.reply_text(txt,reply_markup=kb)
     
-@bot.on_callback_query(filters.regex("^donate_(.*)$"),18)
+@bot.on_callback_query(filters.regex(r"^donate_(.*)$"),18)
 async def donation_dedo(c: bot, q: CallbackQuery):
     spli = q.data.split()
     if len(spli) == 3:
