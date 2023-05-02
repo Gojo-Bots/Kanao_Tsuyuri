@@ -12,7 +12,8 @@ from Powers.database.stuffs import STUFF
 from Powers.database.user_info import USERS
 from Powers.utils.keyboard import *
 
-DEV_LEVEL = SUDO + list(OWNER) + list(DEV)
+DEV_s = SUDO.append(OWNER)
+DEV_LEVEL = DEV_s.append(DEV)
 
 @bot.on_message(filters.command(["myreward", "reward", "buy"], pre) & filters.private)
 async def rewards(c: bot, m: Message):
