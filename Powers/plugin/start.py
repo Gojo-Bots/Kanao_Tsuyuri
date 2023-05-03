@@ -62,7 +62,7 @@ async def start_(c: bot, m: Message):
     else:
         await m.reply_text(txt,reply_markup=help_kb())
         return
-@bot.on_callback_query(filters.regex("^menu_"), group=-1)
+@bot.on_callback_query(filters.regex(r"^menu_(.*)$"),6)
 async def help_menu_back(c: bot, q: CallbackQuery):
     data = q.data.split("_")[-1]
     if data == "help":
@@ -175,7 +175,7 @@ async def link_(c: bot, m: Message):
         )
         return
 
-@bot.on_callback_query(filters.regex("^new_"), 4)
+@bot.on_callback_query(filters.regex(r"^new_(.*)$"),7)
 async def new_linkkk(c: bot, q: CallbackQuery):
     data = q.data.split("_")[1]
     User = USERS(q.from_user.id)
@@ -756,7 +756,7 @@ Note that the tax is 25% of transfering money i.e. it will be deducted from the 
 """
     await m.reply_text(txt,reply_markup=kb)
     
-@bot.on_callback_query(filters.regex(r"^donate_(.*)$"),18)
+@bot.on_callback_query(filters.regex(r"^donate_(.*)$"),5)
 async def donation_dedo(c: bot, q: CallbackQuery):
     spli = q.data.split()
     if len(spli) == 3:

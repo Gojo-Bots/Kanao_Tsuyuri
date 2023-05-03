@@ -69,7 +69,7 @@ async def rem_file(c:bot , m: Message):
     await m.reply_text(txt, reply_markup=initial_kb(remove=True))
     return   
 
-@bot.on_callback_query(filters.regex("^buy_") | filters.regex("^rmbuy"), 0)
+@bot.on_callback_query(filters.regex(r"^buy_(.*)$") | filters.regex(r"^rmbuy_(.*)$"), 0)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
@@ -97,7 +97,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         return
 
 
-@bot.on_callback_query(group=1)
+@bot.on_callback_query(group=-1)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
@@ -137,7 +137,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             print(e)
             return
 
-@bot.on_callback_query(filters.regex("^rmbback") | filters.regex("^bback"))
+@bot.on_callback_query(filters.regex(r"^rmbback_(.*)$") | filters.regex(r"^bback_(.*)$"),1)
 async def after_rm_back(c:bot, q: CallbackQuery):
     call,need = q.data.split("_",1)
     if call == "rmbback":
@@ -180,7 +180,7 @@ async def after_rm_back(c:bot, q: CallbackQuery):
             await q.message.reply_text(f"Failed to change the menu due to\n{e}")
 
             return
-@bot.on_callback_query(filters.regex("^want_") | filters.regex("^rmwant_"),group=5)
+@bot.on_callback_query(filters.regex(r"^want_(.*)$") | filters.regex(r"^rmwant_(.*)$")2)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
@@ -278,7 +278,7 @@ async def premium_channel(c: bot, m: Message):
             f"You Don't have enough {COIN_NAME + ' ' + COIN_EMOJI} to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST} {COIN_NAME + ' ' + COIN_EMOJI}\n🧿 You have: {u_coin} {COIN_NAME + ' ' + COIN_EMOJI}")
         return
 
-@bot.on_callback_query(filters.regex("^premium_link$"), 3)
+@bot.on_callback_query(filters.regex(r"^premium_link$"), 3)
 async def premium_link(c: bot, q: CallbackQuery):
     u_id = q.from_user.id
     Users = USERS(u_id).get_info()
@@ -314,7 +314,7 @@ async def premium_link(c: bot, q: CallbackQuery):
             f"You Don't have enough {COIN_NAME + ' ' + COIN_EMOJI} to get the link.\nYou need **{PREMIUM_COST - u_coin}** more to get premium channel invite link\n💰 Premium chat cost: {PREMIUM_COST} {COIN_NAME + ' ' + COIN_EMOJI}\n🧿 You have: {u_coin} {COIN_NAME + ' ' + COIN_EMOJI}", reply_markup=back_btn)
         return
 
-@bot.on_callback_query(filters.regex("^call_") | filters.regex("^rmcall_"), 2)
+@bot.on_callback_query(filters.regex(r"^call_(.*)$") | filters.regex(r"^rmcall_(.*)$"), 4)
 async def buy_menu(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
