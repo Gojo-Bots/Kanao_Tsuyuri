@@ -180,7 +180,7 @@ async def after_rm_back(c:bot, q: CallbackQuery):
             await q.message.reply_text(f"Failed to change the menu due to\n{e}")
 
             return
-@bot.on_callback_query(filters.regex(r"^want_(.*)$") | filters.regex(r"^rmwant_(.*)$")2)
+@bot.on_callback_query(filters.regex(r"^want_(.*)$") | filters.regex(r"^rmwant_(.*)$"),2)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
