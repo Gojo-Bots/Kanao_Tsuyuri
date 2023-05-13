@@ -97,7 +97,7 @@ async def initial_call(c: bot, q: CallbackQuery):
         return
 
 
-@bot.on_callback_query(group=-1)
+@bot.on_callback_query(group=69)
 async def initial_call(c: bot, q: CallbackQuery):
     if q.message.chat.type != CT.PRIVATE:
         return
@@ -112,7 +112,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.message.reply_text("Failed to close menu")
             print(e)
             return
-    if call == "back":
+    elif call == "back":
         try:
             await q.edit_message_text(
                 "What you want to buy",
@@ -124,7 +124,7 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.edit_message_text(f"Failed to change the menu due to\n{e}")
             print(e)
             return
-    if call == "rmback":
+    elif call == "rmback":
         try:
             await q.edit_message_text(
                 "What you want to remove",
@@ -136,6 +136,8 @@ async def initial_call(c: bot, q: CallbackQuery):
             await q.edit_message_text(f"Failed to change the menu due to\n{e}")
             print(e)
             return
+    else:
+        raise ContinuePropagation
 
 @bot.on_callback_query(filters.regex(r"^rmbback_(.*)$") | filters.regex(r"^bback_(.*)$"),1)
 async def after_rm_back(c:bot, q: CallbackQuery):
